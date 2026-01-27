@@ -103,5 +103,55 @@
       "providerPlugin": "awscloudformation",
       "service": "LambdaLayer"
     }
+  },
+  "parameters": {
+    "AMPLIFY_function_auth_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "auth"
+        }
+      ]
+    },
+    "AMPLIFY_function_auth_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "auth"
+        }
+      ]
+    },
+    "AMPLIFY_function_glecsnodejshelper_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "glecsnodejshelper"
+        }
+      ]
+    },
+    "AMPLIFY_function_glecsnodejshelper_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "glecsnodejshelper"
+        }
+      ]
+    },
+    "AMPLIFY_function_glecspythonhelper_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "glecspythonhelper"
+        }
+      ]
+    },
+    "AMPLIFY_function_glecspythonhelper_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "glecspythonhelper"
+        }
+      ]
+    }
   }
 }

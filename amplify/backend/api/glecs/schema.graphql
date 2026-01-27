@@ -18,7 +18,7 @@ enum BillStatus {
 }
 
 type UserProfile
-  @model
+  @model(subscriptions: null)
   @auth(
     rules: [
        {
@@ -53,7 +53,7 @@ type UserProfile
 }
 
 type Customer
-  @model
+  @model(subscriptions: null)
   @auth(
     rules: [
       {
@@ -88,7 +88,7 @@ type Customer
 }
 
 type Company
-  @model
+  @model(subscriptions: null)
   @auth(
     rules: [
       {
@@ -127,7 +127,7 @@ type Company
 
 
 type Product
-  @model
+  @model(subscriptions: null)
   @auth(
     rules: [
       {
@@ -172,7 +172,7 @@ type Product
 }
 
 type Category
-  @model
+  @model(subscriptions: null)
   @auth(
     rules: [
       {
@@ -201,7 +201,7 @@ type Category
 }
 
 type Subcategory
-  @model
+  @model(subscriptions: null)
   @auth(
     rules: [
       {
@@ -235,7 +235,7 @@ type Subcategory
 }
 
 type Bill
-  @model
+  @model(subscriptions: null)
   @auth(
     rules: [
       {
@@ -272,7 +272,7 @@ type Bill
 }
 
 type BillItem
-  @model
+  @model(subscriptions: null)
   @auth(
     rules: [
       {
