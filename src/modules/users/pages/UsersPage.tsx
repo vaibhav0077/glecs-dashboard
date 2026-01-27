@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button, Card, List, Space, Typography, Tag, Empty } from "antd";
 import { UserOutlined, UserAddOutlined } from "@ant-design/icons";
 import { useAppSelector } from "../../../store/hooks";
+import { InviteUserModal } from "../components/InviteUserModal";
 
 const { Title, Text } = Typography;
 
@@ -13,7 +14,7 @@ type User = {
 
 export function UsersPage() {
   const { selectedCompany } = useAppSelector((state) => state.company);
-  const [users, setUsers] = useState<User[]>([]); // TODO: Fetch from API
+  const [users] = useState<User[]>([]); // TODO: Fetch from API - setUsers will be used when API is implemented
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
 
   // TODO: Fetch users for the selected company
@@ -89,12 +90,14 @@ export function UsersPage() {
         )}
       </Space>
 
-      {/* TODO: Add InviteUserModal component */}
-      {inviteModalOpen && (
-        <div>
-          {/* InviteUserModal will be added here */}
-        </div>
-      )}
+      <InviteUserModal
+        open={inviteModalOpen}
+        onClose={() => setInviteModalOpen(false)}
+        onSuccess={() => {
+          // TODO: Reload users list when API is implemented
+          setInviteModalOpen(false);
+        }}
+      />
     </Card>
   );
 }

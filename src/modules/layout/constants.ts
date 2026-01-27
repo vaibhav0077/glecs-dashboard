@@ -14,6 +14,7 @@ export type SidebarItem = {
     key: string;
     label: string;
     icon: ComponentType;
+    children?: SidebarItem[];
 };
 
 export const SIDEBAR_ITEMS: SidebarItem[] = [
@@ -33,9 +34,26 @@ export const SIDEBAR_ITEMS: SidebarItem[] = [
         label: "Users",
     },
     {
-        key: APP_ROUTES.products,
+        key: "products-menu",
         icon: AppstoreOutlined,
         label: "Products",
+        children: [
+            {
+                key: APP_ROUTES.products,
+                icon: AppstoreOutlined,
+                label: "Products",
+            },
+            {
+                key: APP_ROUTES.categories,
+                icon: AppstoreOutlined,
+                label: "Categories",
+            },
+            {
+                key: APP_ROUTES.subcategories,
+                icon: AppstoreOutlined,
+                label: "Subcategories",
+            },
+        ],
     },
     {
         key: APP_ROUTES.customers,

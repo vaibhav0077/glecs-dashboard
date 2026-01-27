@@ -90,6 +90,23 @@
   "function": {
     "auth": {
       "build": true,
+      "dependsOn": [
+        {
+          "attributes": [
+            "GraphQLAPIIdOutput",
+            "GraphQLAPIEndpointOutput"
+          ],
+          "category": "api",
+          "resourceName": "glecs"
+        },
+        {
+          "attributes": [
+            "UserPoolId"
+          ],
+          "category": "auth",
+          "resourceName": "glecsauth"
+        }
+      ],
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },

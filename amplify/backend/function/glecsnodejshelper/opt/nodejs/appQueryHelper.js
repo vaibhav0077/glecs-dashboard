@@ -4,7 +4,7 @@ const AWSAppSyncClient = require("aws-appsync").default;
 const { AUTH_TYPE } = require("aws-appsync");
 const gql = require("graphql-tag");
 AWS.config.update({ region: process.env.REGION });
-const appsyncUrl = process.env.API_TEMPLATEBUILDER_GRAPHQLAPIENDPOINTOUTPUT;
+const appsyncUrl = process.env.API_GLECS_GRAPHQLAPIENDPOINTOUTPUT;
 
 // graphql client.  We define it outside of the lambda function in order for it to be reused during subsequent calls
 const appsyncClient = new AWSAppSyncClient({

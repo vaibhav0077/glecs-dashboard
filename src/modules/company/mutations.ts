@@ -36,3 +36,25 @@ export const createUserCompanyConnectionMutation = /* GraphQL */ `
     }
   }
 `;
+
+export const updateCompanyMutation = /* GraphQL */ `
+  mutation UpdateCompany($input: UpdateCompanyInput!) {
+    updateCompany(input: $input) {
+      id
+      name
+      legalName
+      description
+      website
+      phone
+      addressLine1
+      addressLine2
+      city
+      state
+      postalCode
+      country
+      isActive
+      createdAt
+      updatedAt
+    }
+  }
+`;

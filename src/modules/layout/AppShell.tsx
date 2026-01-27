@@ -31,10 +31,20 @@ export function AppShell() {
   const { selectedCompany, companies } = useAppSelector((state) => state.company);
 
   const selectedKey = useMemo(() => {
-    const match = SIDEBAR_ITEMS.find((item) =>
-      typeof item?.key === "string" ? location.pathname.startsWith(item.key) : false
-    );
-    return match?.key ? [String(match.key)] : [];
+    // Check all items including children
+    for (const item of SIDEBAR_ITEMS) {
+      if (item.children) {
+        const childMatch = item.children.find((child) =>
+          location.pathname.startsWith(child.key)
+        );
+        if (childMatch) {
+          return [childMatch.key];
+        }
+      } else if (location.pathname.startsWith(item.key)) {
+        return [item.key];
+      }
+    }
+    return [];
   }, [location.pathname]);
 
   const handleLogout = async () => {
@@ -68,11 +78,25 @@ export function AppShell() {
     <Menu
       mode="inline"
       selectedKeys={selectedKey}
-      items={SIDEBAR_ITEMS.map((item) => ({
-        key: item.key,
-        icon: <item.icon />,
-        label: <Link to={item.key}>{item.label}</Link>,
-      }))}
+      items={SIDEBAR_ITEMS.map((item) => {
+        if (item.children) {
+          return {
+            key: item.key,
+            icon: <item.icon />,
+            label: item.label,
+            children: item.children.map((child) => ({
+              key: child.key,
+              icon: <child.icon />,
+              label: <Link to={child.key}>{child.label}</Link>,
+            })),
+          };
+        }
+        return {
+          key: item.key,
+          icon: <item.icon />,
+          label: <Link to={item.key}>{item.label}</Link>,
+        };
+      })}
       className="app-menu"
     />
   );

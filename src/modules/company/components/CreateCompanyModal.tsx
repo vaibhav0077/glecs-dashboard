@@ -1,27 +1,68 @@
-import { useState } from "react";
-import { Alert, Button, Form, Input, Modal, message } from "antd";
+import { useEffect, useState } from "react";
+import { Alert, Button, Form, Input, Modal, Switch, message } from "antd";
 import { generateClient } from "aws-amplify/api";
 import { fetchUserAttributes } from "aws-amplify/auth";
 import {
     createCompanyMutation,
     createUserCompanyConnectionMutation,
+    updateCompanyMutation,
 } from "../mutations";
+
+type Company = {
+    id: string;
+    name: string;
+    legalName?: string | null;
+    description?: string | null;
+    website?: string | null;
+    phone?: string | null;
+    addressLine1?: string | null;
+    addressLine2?: string | null;
+    city?: string | null;
+    state?: string | null;
+    postalCode?: string | null;
+    country?: string | null;
+    isActive?: boolean | null;
+};
 
 type CreateCompanyModalProps = {
     open: boolean;
     onClose: () => void;
     onSuccess: () => void;
+    company?: Company | null; // If provided, modal is in edit mode
 };
 
 export function CreateCompanyModal({
     open,
     onClose,
     onSuccess,
+    company,
 }: CreateCompanyModalProps) {
     const [form] = Form.useForm();
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const client = generateClient();
+    const isEditMode = !!company;
+
+    useEffect(() => {
+        if (open && company) {
+            form.setFieldsValue({
+                name: company.name,
+                legalName: company.legalName || undefined,
+                description: company.description || undefined,
+                website: company.website || undefined,
+                phone: company.phone || undefined,
+                addressLine1: company.addressLine1 || undefined,
+                addressLine2: company.addressLine2 || undefined,
+                city: company.city || undefined,
+                state: company.state || undefined,
+                postalCode: company.postalCode || undefined,
+                country: company.country || undefined,
+                isActive: company.isActive ?? true,
+            });
+        } else if (open && !company) {
+            form.resetFields();
+        }
+    }, [open, company, form]);
 
     const handleSubmit = async (values: {
         name: string;
@@ -35,66 +76,98 @@ export function CreateCompanyModal({
         state?: string;
         postalCode?: string;
         country?: string;
+        isActive?: boolean;
     }) => {
         setSubmitting(true);
         setError(null);
 
         try {
-            // Get user email
-            const attributes = await fetchUserAttributes();
-            const email = attributes.email;
+            if (isEditMode && company) {
+                // Update existing company
+                await client.graphql({
+                    query: updateCompanyMutation,
+                    variables: {
+                        input: {
+                            id: company.id,
+                            name: values.name,
+                            legalName: values.legalName || undefined,
+                            description: values.description || undefined,
+                            website: values.website || undefined,
+                            phone: values.phone || undefined,
+                            addressLine1: values.addressLine1 || undefined,
+                            addressLine2: values.addressLine2 || undefined,
+                            city: values.city || undefined,
+                            state: values.state || undefined,
+                            postalCode: values.postalCode || undefined,
+                            country: values.country || undefined,
+                            isActive: values.isActive ?? true,
+                        },
+                    },
+                    authMode: "userPool",
+                });
 
-            if (!email) {
-                throw new Error("User email not found.");
+                message.success("Company updated successfully!");
+            } else {
+                // Create new company
+                const attributes = await fetchUserAttributes();
+                const email = attributes.email;
+
+                if (!email) {
+                    throw new Error("User email not found.");
+                }
+
+                const createCompanyResponse = (await client.graphql({
+                    query: createCompanyMutation,
+                    variables: {
+                        input: {
+                            name: values.name,
+                            legalName: values.legalName || undefined,
+                            description: values.description || undefined,
+                            website: values.website || undefined,
+                            phone: values.phone || undefined,
+                            addressLine1: values.addressLine1 || undefined,
+                            addressLine2: values.addressLine2 || undefined,
+                            city: values.city || undefined,
+                            state: values.state || undefined,
+                            postalCode: values.postalCode || undefined,
+                            country: values.country || undefined,
+                            isActive: values.isActive ?? true,
+                        },
+                    },
+                    authMode: "userPool",
+                })) as { data?: { createCompany?: { id: string } } };
+
+                const companyId = createCompanyResponse.data?.createCompany?.id;
+
+                if (!companyId) {
+                    throw new Error("Failed to create company.");
+                }
+
+                // Link user to company
+                await client.graphql({
+                    query: createUserCompanyConnectionMutation,
+                    variables: {
+                        input: {
+                            userProfileEmail: email,
+                            companyId: companyId,
+                        },
+                    },
+                    authMode: "userPool",
+                });
+
+                message.success("Company created and linked successfully!");
             }
 
-            // Create company
-            const createCompanyResponse = (await client.graphql({
-                query: createCompanyMutation,
-                variables: {
-                    input: {
-                        name: values.name,
-                        legalName: values.legalName || undefined,
-                        description: values.description || undefined,
-                        website: values.website || undefined,
-                        phone: values.phone || undefined,
-                        addressLine1: values.addressLine1 || undefined,
-                        addressLine2: values.addressLine2 || undefined,
-                        city: values.city || undefined,
-                        state: values.state || undefined,
-                        postalCode: values.postalCode || undefined,
-                        country: values.country || undefined,
-                        isActive: true,
-                    },
-                },
-                authMode: "userPool",
-            })) as { data?: { createCompany?: { id: string } } };
-
-            const companyId = createCompanyResponse.data?.createCompany?.id;
-
-            if (!companyId) {
-                throw new Error("Failed to create company.");
-            }
-
-            // Link user to company
-            await client.graphql({
-                query: createUserCompanyConnectionMutation,
-                variables: {
-                    input: {
-                        userProfileEmail: email,
-                        companyId: companyId,
-                    },
-                },
-                authMode: "userPool",
-            });
-
-            message.success("Company created and linked successfully!");
             form.resetFields();
             onSuccess();
             onClose();
         } catch (err) {
             const messageText =
-                err instanceof Error ? err.message : "Failed to create company.";
+                err instanceof Error
+                    ? err.message
+                    : isEditMode
+                      ? "Failed to update company."
+                      : "Failed to create company.";
             setError(messageText);
         } finally {
             setSubmitting(false);
@@ -109,7 +182,7 @@ export function CreateCompanyModal({
 
     return (
         <Modal
-            title="Create Company"
+            title={isEditMode ? "Edit Company" : "Create Company"}
             open={open}
             onCancel={handleCancel}
             footer={null}
@@ -175,6 +248,16 @@ export function CreateCompanyModal({
                     <Input placeholder="Enter country (optional)" />
                 </Form.Item>
 
+                {isEditMode && (
+                    <Form.Item
+                        label="Status"
+                        name="isActive"
+                        valuePropName="checked"
+                    >
+                        <Switch checkedChildren="Active" unCheckedChildren="Inactive" />
+                    </Form.Item>
+                )}
+
                 <Form.Item style={{ marginBottom: 0, marginTop: 24 }}>
                     <Button
                         type="primary"
@@ -183,7 +266,7 @@ export function CreateCompanyModal({
                         loading={submitting}
                         style={{ height: 44 }}
                     >
-                        Create Company
+                        {isEditMode ? "Update Company" : "Create Company"}
                     </Button>
                 </Form.Item>
             </Form>

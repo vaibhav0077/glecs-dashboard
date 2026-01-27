@@ -21,7 +21,7 @@ def create_graphql_client():
     awsauth = AWS4Auth(credentials.access_key, credentials.secret_key,
                        region, service, session_token=credentials.token)
 
-    transport = RequestsHTTPTransport(url=os.environ['API_TEMPLATEBUILDER_GRAPHQLAPIENDPOINTOUTPUT'],
+    transport = RequestsHTTPTransport(url=os.environ['API_GLECS_GRAPHQLAPIENDPOINTOUTPUT'],
                                       headers=headers,
                                       auth=awsauth)
     client = Client(transport=transport,
@@ -34,10 +34,11 @@ def get_appsync_auth():
     service = "appsync"
     region = os.environ['REGION']
     gql_awsauth = AWS4Auth(credentials.access_key, credentials.secret_key,
-                       region, service, session_token=credentials.token)
+                           region, service, session_token=credentials.token)
 
-    APPSYNC_URL = os.environ['API_TEMPLATEBUILDER_GRAPHQLAPIENDPOINTOUTPUT']
+    APPSYNC_URL = os.environ['API_GLECS_GRAPHQLAPIENDPOINTOUTPUT']
     return APPSYNC_URL, gql_awsauth
+
 
 def get_secret():
     secret_name = os.environ['SECRET_CREDS']
@@ -58,6 +59,7 @@ def get_secret():
         print(error_message)
         traceback.print_exc()
     return None
+
 
 def convert_graphql_to_rest(products):
     # Extracting the product information from the GraphQL response

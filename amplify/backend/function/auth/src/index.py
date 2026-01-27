@@ -78,10 +78,11 @@ def invite_user():
         # Get the request data (try both JSON and form data)
         request_data = app.current_request.json_body or {}
 
-        # Extract email and companyId from request
+        # Extract email, companyId, and role from request
         email = request_data.get('email')
         company_id = request_data.get('companyId')
         name = request_data.get('name')  # Optional
+        role = request_data.get('role')  # Optional: ADMIN, SUPERADMIN, STAFF
 
         if not email:
             return Response(
@@ -92,6 +93,15 @@ def invite_user():
         if not company_id:
             return Response(
                 body={'error': 'companyId is required'},
+                status_code=400
+            )
+
+        # Validate role if provided
+        valid_roles = ['ADMIN', 'SUPERADMIN', 'STAFF', 'VAIBHAV']
+        if role and role not in valid_roles:
+            return Response(
+                body={
+                    'error': f'Invalid role. Must be one of: {", ".join(valid_roles)}'},
                 status_code=400
             )
 
@@ -133,6 +143,26 @@ def invite_user():
                     'error': f'Failed to create user in Cognito: {str(cognito_error)}'},
                 status_code=500
             )
+
+        # Assign user to Cognito group if role is provided
+        if role:
+            try:
+                cognito_client.admin_add_user_to_group(
+                    UserPoolId=user_pool_id,
+                    Username=email,
+                    GroupName=role
+                )
+                print(f"User {email} added to group {role}")
+            except cognito_client.exceptions.ResourceNotFoundException as e:
+                print(f"Group {role} not found: {str(e)}")
+                # Continue - group might not exist
+            except Exception as group_error:
+                error_str = str(group_error)
+                if "already exists" in error_str.lower() or "already a member" in error_str.lower():
+                    print(f"User {email} is already in group {role}")
+                else:
+                    print(f"Error adding user to group: {str(group_error)}")
+                    # Continue - group assignment failure shouldn't block user creation
 
         # Step 2: Create UserProfile in DynamoDB via GraphQL
         create_user_profile_mutation = """

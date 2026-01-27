@@ -10,6 +10,14 @@ import { NoCompanyPage } from "../modules/pages/NoCompanyPage";
 import { AppShell } from "../modules/layout/AppShell";
 import { CompaniesPage } from "../modules/company/pages/CompaniesPage";
 import { UsersPage } from "../modules/users/pages/UsersPage";
+import { ProductsPage } from "../modules/products/pages/ProductsPage";
+import { AddProductPage } from "../modules/products/pages/AddProductPage";
+import { EditProductPage } from "../modules/products/pages/EditProductPage";
+import { CategoriesPage } from "../modules/products/pages/CategoriesPage";
+import { SubcategoriesPage } from "../modules/products/pages/SubcategoriesPage";
+import { CustomersPage } from "../modules/customers/pages/CustomersPage";
+import { AddCustomerPage } from "../modules/customers/pages/AddCustomerPage";
+import { EditCustomerPage } from "../modules/customers/pages/EditCustomerPage";
 
 type GuardProps = {
   children: React.ReactNode;
@@ -142,7 +150,39 @@ export function AppRoutes() {
           path={APP_ROUTES.products}
           element={
             <CompanyGuard>
-              <PlaceholderPage title="Products" />
+              <ProductsPage />
+            </CompanyGuard>
+          }
+        />
+        <Route
+          path={`${APP_ROUTES.products}/add`}
+          element={
+            <CompanyGuard>
+              <AddProductPage />
+            </CompanyGuard>
+          }
+        />
+        <Route
+          path={`${APP_ROUTES.products}/edit/:id`}
+          element={
+            <CompanyGuard>
+              <EditProductPage />
+            </CompanyGuard>
+          }
+        />
+        <Route
+          path={APP_ROUTES.categories}
+          element={
+            <CompanyGuard>
+              <CategoriesPage />
+            </CompanyGuard>
+          }
+        />
+        <Route
+          path={APP_ROUTES.subcategories}
+          element={
+            <CompanyGuard>
+              <SubcategoriesPage />
             </CompanyGuard>
           }
         />
@@ -150,7 +190,23 @@ export function AppRoutes() {
           path={APP_ROUTES.customers}
           element={
             <CompanyGuard>
-              <PlaceholderPage title="Customers" />
+              <CustomersPage />
+            </CompanyGuard>
+          }
+        />
+        <Route
+          path={`${APP_ROUTES.customers}/add`}
+          element={
+            <CompanyGuard>
+              <AddCustomerPage />
+            </CompanyGuard>
+          }
+        />
+        <Route
+          path={`${APP_ROUTES.customers}/edit/:id`}
+          element={
+            <CompanyGuard>
+              <EditCustomerPage />
             </CompanyGuard>
           }
         />

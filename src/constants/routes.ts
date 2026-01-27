@@ -8,6 +8,8 @@ export const AUTH_ROUTES = {
 export const APP_ROUTES = {
   dashboard: "/dashboard",
   products: "/products",
+  categories: "/categories",
+  subcategories: "/subcategories",
   customers: "/customers",
   bills: "/bills",
   inventory: "/inventory",
