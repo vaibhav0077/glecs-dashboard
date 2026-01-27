@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "{\"createdOn\":\"Mac\",\"createdBy\":\"Amplify\",\"createdWith\":\"12.12.4\",\"stackType\":\"function-LambdaLayer\",\"metadata\":{}}",
+  "Description": "Lambda layer resource stack creation using Amplify CLI",
   "Parameters": {
     "env": {
       "Type": "String"
@@ -20,23 +20,19 @@
     }
   },
   "Resources": {
-    "LambdaLayerVersion41f0b75d": {
+    "LambdaLayerVersion5925b978": {
       "Type": "AWS::Lambda::LayerVersion",
       "Properties": {
-        "CompatibleRuntimes": {
-          "Ref": "runtimes"
-        },
+        "CompatibleRuntimes": [
+          "nodejs18.x"
+        ],
         "Content": {
           "S3Bucket": {
             "Ref": "deploymentBucketName"
           },
-          "S3Key": {
-            "Ref": "s3Key"
-          }
+          "S3Key": "amplify-builds/glecsnodejshelper-LambdaLayerVersion5925b978-build.zip"
         },
-        "Description": {
-          "Ref": "description"
-        },
+        "Description": "Updated layer version 2026-01-27T08:58:32.259Z",
         "LayerName": {
           "Fn::Sub": [
             "glecsnodejshelper-${env}",
@@ -51,13 +47,11 @@
       "DeletionPolicy": "Delete",
       "UpdateReplacePolicy": "Retain"
     },
-    "LambdaLayerPermissionPrivate41f0b75d": {
+    "LambdaLayerPermissionPrivate5925b978": {
       "Type": "AWS::Lambda::LayerVersionPermission",
       "Properties": {
         "Action": "lambda:GetLayerVersion",
-        "LayerVersionArn": {
-          "Ref": "LambdaLayerVersion41f0b75d"
-        },
+        "LayerVersionArn": "arn:aws:lambda:ap-south-1:131677314271:layer:glecsnodejshelper-prod:2",
         "Principal": {
           "Ref": "AWS::AccountId"
         }
@@ -67,7 +61,7 @@
   "Outputs": {
     "Arn": {
       "Value": {
-        "Ref": "LambdaLayerVersion41f0b75d"
+        "Ref": "LambdaLayerVersion5925b978"
       }
     }
   }

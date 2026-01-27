@@ -53,3 +53,4 @@ amplifytools.xcconfig
 
 amplify/backend/function/glecspythonhelper/lib/python/lib/*
 
+amplify/.temp/*

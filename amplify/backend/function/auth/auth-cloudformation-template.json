@@ -15,10 +15,6 @@
     },
     "s3Key": {
       "Type": "String"
-    },
-    "functionglecspythonhelperArn": {
-      "Type": "String",
-      "Default": "functionglecspythonhelperArn"
     }
   },
   "Conditions": {
@@ -83,11 +79,7 @@
           ]
         },
         "Runtime": "python3.12",
-        "Layers": [
-          {
-            "Ref": "functionglecspythonhelperArn"
-          }
-        ],
+        "Layers": [],
         "Timeout": 25
       }
     },
@@ -168,19 +160,6 @@
                   }
                 ]
               }
-            },
-            {
-              "Effect": "Allow",
-              "Action": [
-                "cloudfront:*",
-                "s3:*",
-                "ses:*",
-                "appsync:*",
-                "dynamodb:*",
-                "cognito-identity:*",
-                "cognito-idp:*"
-              ],
-              "Resource": "*"
             }
           ]
         }

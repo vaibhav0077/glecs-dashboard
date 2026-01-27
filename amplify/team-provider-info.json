@@ -46,7 +46,8 @@
       "UnauthRoleName": "amplify-glecs-prod-0a8a7-unauthRole",
       "StackName": "amplify-glecs-prod-0a8a7",
       "StackId": "arn:aws:cloudformation:ap-south-1:131677314271:stack/amplify-glecs-prod-0a8a7/d6acaf60-fb42-11f0-aaa9-06538920a9b7",
-      "AmplifyAppId": "d9a2lxpb89hwa"
+      "AmplifyAppId": "d9a2lxpb89hwa",
+      "APIGatewayAuthURL": "https://s3.amazonaws.com/amplify-glecs-prod-0a8a7-deployment/amplify-cfn-templates/api/APIGatewayAuthStack.json"
     },
     "categories": {
       "auth": {
@@ -56,20 +57,20 @@
       "function": {
         "auth": {
           "deploymentBucketName": "amplify-glecs-prod-0a8a7-deployment",
-          "s3Key": "amplify-builds/auth-68643051574d735a4c47-build.zip"
+          "s3Key": "amplify-builds/auth-5036316b69346e4f4746-build.zip"
         },
         "glecsnodejshelper": {
           "deploymentBucketName": "amplify-glecs-prod-0a8a7-deployment",
-          "s3Key": "amplify-builds/glecsnodejshelper-LambdaLayerVersion41f0b75d-build.zip"
+          "s3Key": "amplify-builds/glecsnodejshelper-LambdaLayerVersion5925b978-build.zip"
         },
         "glecspythonhelper": {
           "deploymentBucketName": "amplify-glecs-prod-0a8a7-deployment",
-          "s3Key": "amplify-builds/glecspythonhelper-LambdaLayerVersionff8e2939-build.zip"
+          "s3Key": "amplify-builds/glecspythonhelper-LambdaLayerVersiona4dee4c6-build.zip"
         }
       },
       "api": {
-        "glecs": {},
-        "glecsrestapi": {}
+        "glecsrestapi": {},
+        "glecs": {}
       }
     }
   }

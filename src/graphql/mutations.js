@@ -1072,7 +1072,6 @@ export const createUserProfile = /* GraphQL */ `
     $condition: ModelUserProfileConditionInput
   ) {
     createUserProfile(input: $input, condition: $condition) {
-      id
       email
       name
       phone
@@ -1092,7 +1091,6 @@ export const updateUserProfile = /* GraphQL */ `
     $condition: ModelUserProfileConditionInput
   ) {
     updateUserProfile(input: $input, condition: $condition) {
-      id
       email
       name
       phone
@@ -1112,7 +1110,6 @@ export const deleteUserProfile = /* GraphQL */ `
     $condition: ModelUserProfileConditionInput
   ) {
     deleteUserProfile(input: $input, condition: $condition) {
-      id
       email
       name
       phone
@@ -1133,10 +1130,9 @@ export const createUserCompanyConnection = /* GraphQL */ `
   ) {
     createUserCompanyConnection(input: $input, condition: $condition) {
       id
-      userProfileId
+      userProfileEmail
       companyId
       userProfile {
-        id
         email
         name
         phone
@@ -1176,10 +1172,9 @@ export const updateUserCompanyConnection = /* GraphQL */ `
   ) {
     updateUserCompanyConnection(input: $input, condition: $condition) {
       id
-      userProfileId
+      userProfileEmail
       companyId
       userProfile {
-        id
         email
         name
         phone
@@ -1219,10 +1214,9 @@ export const deleteUserCompanyConnection = /* GraphQL */ `
   ) {
     deleteUserCompanyConnection(input: $input, condition: $condition) {
       id
-      userProfileId
+      userProfileEmail
       companyId
       userProfile {
-        id
         email
         name
         phone

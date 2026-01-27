@@ -900,9 +900,8 @@ export const billItemsByProduct = /* GraphQL */ `
   }
 `;
 export const getUserProfile = /* GraphQL */ `
-  query GetUserProfile($id: ID!) {
-    getUserProfile(id: $id) {
-      id
+  query GetUserProfile($email: AWSEmail!) {
+    getUserProfile(email: $email) {
       email
       name
       phone
@@ -918,13 +917,20 @@ export const getUserProfile = /* GraphQL */ `
 `;
 export const listUserProfiles = /* GraphQL */ `
   query ListUserProfiles(
+    $email: AWSEmail
     $filter: ModelUserProfileFilterInput
     $limit: Int
     $nextToken: String
+    $sortDirection: ModelSortDirection
   ) {
-    listUserProfiles(filter: $filter, limit: $limit, nextToken: $nextToken) {
+    listUserProfiles(
+      email: $email
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+      sortDirection: $sortDirection
+    ) {
       items {
-        id
         email
         name
         phone
@@ -941,10 +947,9 @@ export const getUserCompanyConnection = /* GraphQL */ `
   query GetUserCompanyConnection($id: ID!) {
     getUserCompanyConnection(id: $id) {
       id
-      userProfileId
+      userProfileEmail
       companyId
       userProfile {
-        id
         email
         name
         phone
@@ -990,7 +995,7 @@ export const listUserCompanyConnections = /* GraphQL */ `
     ) {
       items {
         id
-        userProfileId
+        userProfileEmail
         companyId
         createdAt
         updatedAt
@@ -1002,16 +1007,16 @@ export const listUserCompanyConnections = /* GraphQL */ `
     }
   }
 `;
-export const userCompanyConnectionsByUserProfileId = /* GraphQL */ `
-  query UserCompanyConnectionsByUserProfileId(
-    $userProfileId: ID!
+export const userCompanyConnectionsByUserProfileEmail = /* GraphQL */ `
+  query UserCompanyConnectionsByUserProfileEmail(
+    $userProfileEmail: AWSEmail!
     $sortDirection: ModelSortDirection
     $filter: ModelUserCompanyConnectionFilterInput
     $limit: Int
     $nextToken: String
   ) {
-    userCompanyConnectionsByUserProfileId(
-      userProfileId: $userProfileId
+    userCompanyConnectionsByUserProfileEmail(
+      userProfileEmail: $userProfileEmail
       sortDirection: $sortDirection
       filter: $filter
       limit: $limit
@@ -1019,7 +1024,7 @@ export const userCompanyConnectionsByUserProfileId = /* GraphQL */ `
     ) {
       items {
         id
-        userProfileId
+        userProfileEmail
         companyId
         createdAt
         updatedAt
@@ -1048,7 +1053,7 @@ export const userCompanyConnectionsByCompanyId = /* GraphQL */ `
     ) {
       items {
         id
-        userProfileId
+        userProfileEmail
         companyId
         createdAt
         updatedAt

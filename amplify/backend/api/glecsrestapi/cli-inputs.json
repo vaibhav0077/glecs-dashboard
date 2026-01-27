@@ -5,33 +5,7 @@
       "name": "/auth",
       "lambdaFunction": "auth",
       "permissions": {
-        "setting": "private",
-        "auth": [
-          "create",
-          "read",
-          "update",
-          "delete"
-        ],
-        "groups": {
-          "VAIBHAV": [
-            "create",
-            "read",
-            "update",
-            "delete"
-          ],
-          "SUPERADMIN": [
-            "create",
-            "read",
-            "update",
-            "delete"
-          ],
-          "ADMIN": [
-            "create",
-            "read",
-            "update",
-            "delete"
-          ]
-        }
+        "setting": "open"
       }
     }
   }

@@ -37,34 +37,6 @@
           ],
           "category": "function",
           "resourceName": "auth"
-        },
-        {
-          "attributes": [
-            "UserPoolId"
-          ],
-          "category": "auth",
-          "resourceName": "glecsauth"
-        },
-        {
-          "attributes": [
-            "VAIBHAVGroupRole"
-          ],
-          "category": "auth",
-          "resourceName": "userPoolGroups"
-        },
-        {
-          "attributes": [
-            "SUPERADMINGroupRole"
-          ],
-          "category": "auth",
-          "resourceName": "userPoolGroups"
-        },
-        {
-          "attributes": [
-            "ADMINGroupRole"
-          ],
-          "category": "auth",
-          "resourceName": "userPoolGroups"
         }
       ],
       "providerPlugin": "awscloudformation",
@@ -118,15 +90,6 @@
   "function": {
     "auth": {
       "build": true,
-      "dependsOn": [
-        {
-          "attributes": [
-            "Arn"
-          ],
-          "category": "function",
-          "resourceName": "glecspythonhelper"
-        }
-      ],
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },

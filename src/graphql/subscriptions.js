@@ -8,10 +8,9 @@ export const onCreateUserCompanyConnection = /* GraphQL */ `
   ) {
     onCreateUserCompanyConnection(filter: $filter, email: $email) {
       id
-      userProfileId
+      userProfileEmail
       companyId
       userProfile {
-        id
         email
         name
         phone
@@ -51,10 +50,9 @@ export const onUpdateUserCompanyConnection = /* GraphQL */ `
   ) {
     onUpdateUserCompanyConnection(filter: $filter, email: $email) {
       id
-      userProfileId
+      userProfileEmail
       companyId
       userProfile {
-        id
         email
         name
         phone
@@ -94,10 +92,9 @@ export const onDeleteUserCompanyConnection = /* GraphQL */ `
   ) {
     onDeleteUserCompanyConnection(filter: $filter, email: $email) {
       id
-      userProfileId
+      userProfileEmail
       companyId
       userProfile {
-        id
         email
         name
         phone
