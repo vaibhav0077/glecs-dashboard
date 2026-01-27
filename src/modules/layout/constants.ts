@@ -5,6 +5,8 @@ import {
     TeamOutlined,
     ShoppingOutlined,
     FileTextOutlined,
+    BankOutlined,
+    UserOutlined,
 } from "@ant-design/icons";
 import { APP_ROUTES } from "../../constants/routes";
 
@@ -19,6 +21,16 @@ export const SIDEBAR_ITEMS: SidebarItem[] = [
         key: APP_ROUTES.dashboard,
         icon: DashboardOutlined,
         label: "Dashboard",
+    },
+    {
+        key: APP_ROUTES.companies,
+        icon: BankOutlined,
+        label: "Companies",
+    },
+    {
+        key: APP_ROUTES.users,
+        icon: UserOutlined,
+        label: "Users",
     },
     {
         key: APP_ROUTES.products,

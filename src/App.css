@@ -13,3 +13,5 @@
   align-items: center;
   justify-content: center;
 }
+
+/* Overlay blur styles removed; routing handles no-company state now. */

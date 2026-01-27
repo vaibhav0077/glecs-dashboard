@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { fetchAuthSession, fetchUserAttributes } from "aws-amplify/auth";
-import { generateClient } from "aws-amplify/api";
 import { getUserProfileQuery } from "../queries";
-
-const client = generateClient();
+import { generateClient } from "aws-amplify/api";
+import { useAppDispatch } from "../../../store/hooks";
+import { setCompanies } from "../../../store/slices/companySlice";
 
 type CompanySummary = {
   id: string;
@@ -14,7 +14,10 @@ type CompanySummary = {
 type UserProfileResult = {
   email: string;
   name?: string | null;
-  companies?: { items?: CompanySummary[] | null } | CompanySummary[] | null;
+  companies?:
+    | { items?: { company?: CompanySummary | null }[] | null }
+    | { company?: CompanySummary | null }[]
+    | null;
 };
 
 type UserAccessState = {
@@ -29,6 +32,7 @@ type UserAccessState = {
 const ADMIN_GROUPS = new Set(["ADMIN", "SUPERADMIN", "VAIBHAV"]);
 
 export function useUserAccess(): UserAccessState & { isAdmin: boolean } {
+  const dispatch = useAppDispatch();
   const [state, setState] = useState<UserAccessState>({
     email: null,
     groups: [],
@@ -54,7 +58,8 @@ export function useUserAccess(): UserAccessState & { isAdmin: boolean } {
           throw new Error("Email is missing in user attributes.");
         }
 
-        const response = (await client.graphql({
+        const apiClient = generateClient();
+        const response = (await apiClient.graphql({
           query: getUserProfileQuery,
           variables: { email },
           authMode: "userPool",
@@ -62,9 +67,12 @@ export function useUserAccess(): UserAccessState & { isAdmin: boolean } {
 
         const profile = response.data?.getUserProfile ?? null;
         const companiesRaw = profile?.companies ?? [];
-        const companies = Array.isArray(companiesRaw)
+        const companyItems = Array.isArray(companiesRaw)
           ? companiesRaw
           : companiesRaw?.items ?? [];
+        const companies = companyItems
+          .map((item) => item?.company)
+          .filter((company): company is CompanySummary => Boolean(company));
 
         if (active) {
           setState({
@@ -75,6 +83,8 @@ export function useUserAccess(): UserAccessState & { isAdmin: boolean } {
             isLoading: false,
             error: null,
           });
+          // Sync companies to Redux (auto-selects first company if none selected)
+          dispatch(setCompanies(companies));
         }
       } catch (err) {
         if (!active) {

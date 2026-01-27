@@ -5,9 +5,11 @@ export const getUserProfileQuery = /* GraphQL */ `
       name
       companies {
         items {
-          id
-          name
-          isActive
+          company {
+            id
+            name
+            isActive
+          }
         }
         nextToken
       }
