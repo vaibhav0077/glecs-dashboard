@@ -62,8 +62,12 @@ backend:
         - echo ${PATH}
         - '# Execute Amplify CLI with the helper script'
         - yarn add simple-git
-        - pyenv install 3.12.0
-        - pyenv global 3.12
+        - export PYENV_ROOT="$HOME/.pyenv"
+        - export PATH="$PYENV_ROOT/bin:$PATH"
+        - eval "$(pyenv init -)"
+        - pyenv install -s 3.12.0
+        - pyenv global 3.12.0
+        - python --version
         - python -m pip install --upgrade pip
         - pip install --user pipenv
         - pip install virtualenv
