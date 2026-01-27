@@ -3,18 +3,51 @@ backend:
   phases:
     build:
       commands:
-        - npm ci --cache .npm --prefer-offline
-        - npx ampx pipeline-deploy --branch $AWS_BRANCH --app-id $AWS_APP_ID
+        - echo ${PATH}
+        - '# Execute Amplify CLI with the helper script'
+        - yarn add simple-git
+        - pyenv install 3.12.0
+        - pyenv global 3.12
+        - python -m pip install --upgrade pip
+        - pip install --user pipenv
+        - pip install virtualenv
+        - export PATH="$PATH:/root/.local/bin"
+        - amplifyPush --simple
 frontend:
   phases:
+    preBuild:
+      commands:
+        - yarn install
+        - |
+          if [ "$VITE_ENVIRONMENT_NAME" = "dev" ]; then
+            echo "VITE_ENVIRONMENT_NAME=$VITE_ENVIRONMENT_NAME" >> .env.dev
+            echo "VITE_SHOPIFY_APP_CLIENT_ID=$VITE_SHOPIFY_APP_CLIENT_ID" >> .env.dev
+            echo "VITE_SHOPIFY_REDIRECT_URL=$VITE_SHOPIFY_REDIRECT_URL" >> .env.dev
+            echo "VITE_STAGE_CLOUDFRONT_DOMAIN=$VITE_STAGE_CLOUDFRONT_DOMAIN" >> .env.dev
+            cat .env.dev
+          elif [ "$VITE_ENVIRONMENT_NAME" = "prod" ]; then
+            echo "VITE_ENVIRONMENT_NAME=$VITE_ENVIRONMENT_NAME" >> .env.prod
+            echo "VITE_SHOPIFY_APP_CLIENT_ID=$VITE_SHOPIFY_APP_CLIENT_ID" >> .env.prod
+            echo "VITE_SHOPIFY_REDIRECT_URL=$VITE_SHOPIFY_REDIRECT_URL" >> .env.prod
+            echo "VITE_STAGE_CLOUDFRONT_DOMAIN=$VITE_STAGE_CLOUDFRONT_DOMAIN" >> .env.prod
+            cat .env.prod
+          elif [ "$VITE_ENVIRONMENT_NAME" = "qa" ]; then
+            echo "VITE_ENVIRONMENT_NAME=$VITE_ENVIRONMENT_NAME" >> .env.qa
+            echo "VITE_SHOPIFY_APP_CLIENT_ID=$VITE_SHOPIFY_APP_CLIENT_ID" >> .env.qa
+            echo "VITE_SHOPIFY_REDIRECT_URL=$VITE_SHOPIFY_REDIRECT_URL" >> .env.qa
+            echo "VITE_STAGE_CLOUDFRONT_DOMAIN=$VITE_STAGE_CLOUDFRONT_DOMAIN" >> .env.qa
+            cat .env.qa
+          else
+            echo "Unknown environment: $VITE_ENVIRONMENT_NAME"
+            exit 1
+          fi
     build:
       commands:
-        - npm run build
+        - yarn run build
   artifacts:
-    baseDirectory: dist
+    baseDirectory: build
     files:
       - '**/*'
   cache:
     paths:
-      - .npm/**/*
       - node_modules/**/*
