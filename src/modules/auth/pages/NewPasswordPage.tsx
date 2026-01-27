@@ -4,7 +4,7 @@ import { confirmSignIn } from "aws-amplify/auth";
 import { Alert, Button, Form, Input, message } from "antd";
 import { LockOutlined, MailOutlined } from "@ant-design/icons";
 import { AuthLayout } from "../components/AuthLayout";
-import { APP_ROUTES, AUTH_ROUTES } from "../../../constants/routes";
+import { APP_ROUTES } from "../../../constants/routes";
 
 export function NewPasswordPage() {
   const [submitting, setSubmitting] = useState(false);

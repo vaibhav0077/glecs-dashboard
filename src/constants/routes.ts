@@ -7,4 +7,8 @@ export const AUTH_ROUTES = {
 
 export const APP_ROUTES = {
   dashboard: "/dashboard",
+  products: "/products",
+  customers: "/customers",
+  bills: "/bills",
+  inventory: "/inventory",
 } as const;

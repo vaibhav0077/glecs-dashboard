@@ -1,0 +1,128 @@
+.app-shell {
+  min-height: 100vh;
+  background: #f5f6fb;
+}
+
+.app-sider {
+  background: #111827;
+}
+
+.app-logo {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.app-logo-text {
+  color: #ffffff;
+  letter-spacing: 0.12em;
+}
+
+.app-menu {
+  background: transparent;
+  color: #f8fafc;
+  border-inline-end: none;
+}
+
+.app-menu .ant-menu-item a {
+  color: #f8fafc;
+}
+
+.app-menu .ant-menu-item .ant-menu-item-icon {
+  color: #f8fafc;
+}
+
+.app-menu .ant-menu-item-selected {
+  background: rgba(79, 70, 229, 0.2);
+  color: #ffffff;
+}
+
+.app-menu .ant-menu-item-selected svg {
+  color: #ffffff;
+}
+
+.app-content {
+  background: #f5f6fb;
+}
+
+.app-header {
+  background: #ffffff;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #eef0f5;
+}
+
+.header-title {
+  font-weight: 600;
+  color: #111827;
+}
+
+.profile-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.app-main {
+  padding: 24px;
+}
+
+.mobile-toggle {
+  display: none;
+}
+
+.mobile-drawer .ant-drawer-body {
+  padding: 0;
+  background: #111827;
+}
+
+.mobile-drawer .ant-drawer-content {
+  background: #111827;
+}
+
+.mobile-drawer .ant-drawer-header {
+  background: #111827;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.mobile-drawer .ant-drawer-title {
+  color: #f8fafc;
+}
+
+.mobile-drawer .ant-drawer-close {
+  color: #f8fafc;
+}
+
+.mobile-drawer .app-menu {
+  background: #111827;
+  color: #f8fafc;
+}
+
+.mobile-drawer .app-menu .ant-menu-item a {
+  color: #f8fafc;
+}
+
+.mobile-drawer .app-menu .ant-menu-item .ant-menu-item-icon {
+  color: #f8fafc;
+}
+
+.mobile-drawer .app-menu .ant-menu-item-selected {
+  background: rgba(79, 70, 229, 0.2);
+  color: #ffffff;
+}
+
+@media (max-width: 991px) {
+  .app-sider {
+    display: none;
+  }
+
+  .mobile-toggle {
+    display: inline-flex;
+  }
+}

@@ -4,6 +4,8 @@ import { AUTH_ROUTES, APP_ROUTES } from "../constants/routes";
 import { AuthRoutes } from "../modules/auth";
 import { useAuth } from "../modules/auth/hooks/useAuth";
 import { DashboardPage } from "../modules/dashboard/pages/DashboardPage";
+import { PlaceholderPage } from "../modules/pages/PlaceholderPage";
+import { AppShell } from "../modules/layout/AppShell";
 
 type GuardProps = {
   children: React.ReactNode;
@@ -58,13 +60,27 @@ export function AppRoutes() {
         }
       />
       <Route
-        path={APP_ROUTES.dashboard}
         element={
           <ProtectedRoute>
-            <DashboardPage />
+            <AppShell />
           </ProtectedRoute>
         }
-      />
+      >
+        <Route path={APP_ROUTES.dashboard} element={<DashboardPage />} />
+        <Route
+          path={APP_ROUTES.products}
+          element={<PlaceholderPage title="Products" />}
+        />
+        <Route
+          path={APP_ROUTES.customers}
+          element={<PlaceholderPage title="Customers" />}
+        />
+        <Route path={APP_ROUTES.bills} element={<PlaceholderPage title="Bills" />} />
+        <Route
+          path={APP_ROUTES.inventory}
+          element={<PlaceholderPage title="Inventory" />}
+        />
+      </Route>
     </Routes>
   );
 }

@@ -42,8 +42,7 @@ type UserProfile
       { allow: private, provider: userPools, operations: [read] }
     ]
   ) {
-  id: ID!
-  email: AWSEmail!
+  email: AWSEmail! @primaryKey
   name: String
   phone: AWSPhone
   companies: [Company]
