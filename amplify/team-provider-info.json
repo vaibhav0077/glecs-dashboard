@@ -1,0 +1,39 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-glecs-dev-a47c7-authRole",
+      "UnauthRoleArn": "arn:aws:iam::131677314271:role/amplify-glecs-dev-a47c7-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::131677314271:role/amplify-glecs-dev-a47c7-authRole",
+      "Region": "ap-south-1",
+      "DeploymentBucketName": "amplify-glecs-dev-a47c7-deployment",
+      "UnauthRoleName": "amplify-glecs-dev-a47c7-unauthRole",
+      "StackName": "amplify-glecs-dev-a47c7",
+      "StackId": "arn:aws:cloudformation:ap-south-1:131677314271:stack/amplify-glecs-dev-a47c7/d6ce3bc0-fb2f-11f0-8892-02b7defc5e27",
+      "AmplifyAppId": "d9a2lxpb89hwa"
+    },
+    "categories": {
+      "auth": {
+        "glecsauth": {},
+        "userPoolGroups": {}
+      },
+      "function": {
+        "auth": {
+          "deploymentBucketName": "amplify-glecs-dev-a47c7-deployment",
+          "s3Key": "amplify-builds/auth-4e77444739712f6e794d-build.zip"
+        },
+        "glecsnodejshelper": {
+          "deploymentBucketName": "amplify-glecs-dev-a47c7-deployment",
+          "s3Key": "amplify-builds/glecsnodejshelper-LambdaLayerVersiond78f158b-build.zip"
+        },
+        "glecspythonhelper": {
+          "deploymentBucketName": "amplify-glecs-dev-a47c7-deployment",
+          "s3Key": "amplify-builds/glecspythonhelper-LambdaLayerVersion15378f9b-build.zip"
+        }
+      },
+      "api": {
+        "glecs": {},
+        "glecsrestapi": {}
+      }
+    }
+  }
+}

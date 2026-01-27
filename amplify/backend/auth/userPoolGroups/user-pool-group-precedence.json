@@ -1,0 +1,18 @@
+[
+  {
+    "groupName": "VAIBHAV",
+    "precedence": 1
+  },
+  {
+    "groupName": "SUPERADMIN",
+    "precedence": 2
+  },
+  {
+    "groupName": "ADMIN",
+    "precedence": 3
+  },
+  {
+    "groupName": "STAFF",
+    "precedence": 4
+  }
+]

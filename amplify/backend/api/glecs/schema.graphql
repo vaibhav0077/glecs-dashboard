@@ -1,0 +1,308 @@
+enum CompanyRole {
+  OWNER
+  ADMIN
+  STAFF
+  VIEWER
+}
+
+enum BillType {
+  SALE
+  PURCHASE
+}
+
+enum BillStatus {
+  DRAFT
+  ISSUED
+  PAID
+  VOID
+}
+
+type UserProfile
+  @model
+  @auth(
+    rules: [
+       {
+        allow: private
+        provider: iam
+        operations: [create, read, update, delete]
+      }
+      {
+        allow: groups
+        groups: ["SUPERADMIN", "ADMIN", "VAIBHAV"]
+        operations: [create, update, delete, read]
+      }
+      { allow: groups, groups: ["STAFF"], operations: [read] }
+      {
+        allow: owner
+        provider: userPools
+        ownerField: "email"
+        identityClaim: "email"
+        operations: [create, read, update, delete]
+      }
+      { allow: private, provider: userPools, operations: [read] }
+    ]
+  ) {
+  id: ID!
+  email: AWSEmail!
+  name: String
+  phone: AWSPhone
+  companies: [Company]
+    @manyToMany(relationName: "UserCompanyConnection")
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+}
+
+type Customer
+  @model
+  @auth(
+    rules: [
+      {
+        allow: groups
+        groups: ["SUPERADMIN", "ADMIN", "VAIBHAV"]
+        operations: [create, update, delete, read]
+      }
+      { allow: groups, groups: ["STAFF"], operations: [read] }
+    ]
+  ) {
+  id: ID!
+  companyId: ID!
+    @index(
+      name: "byCompany"
+      sortKeyFields: ["name"]
+      queryField: "customersByCompany"
+    )
+  name: String!
+  email: AWSEmail
+  phone: AWSPhone
+  addressLine1: String
+  addressLine2: String
+  city: String
+  state: String
+  postalCode: String
+  country: String
+  notes: String
+  company: Company @belongsTo(fields: ["companyId"])
+  bills: [Bill] @hasMany(indexName: "byCustomer", fields: ["id"])
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+}
+
+type Company
+  @model
+  @auth(
+    rules: [
+      {
+        allow: groups
+        groups: ["SUPERADMIN", "ADMIN", "VAIBHAV"]
+        operations: [create, update, delete, read]
+      }
+      { allow: groups, groups: ["STAFF"], operations: [read] }
+    ]
+  ) {
+  id: ID!
+  name: String!
+  legalName: String
+  description: String
+  website: AWSURL
+  phone: AWSPhone
+  addressLine1: String
+  addressLine2: String
+  city: String
+  state: String
+  postalCode: String
+  country: String
+  isActive: Boolean!
+  users: [UserProfile]
+    @manyToMany(relationName: "UserCompanyConnection")
+  products: [Product] @hasMany(indexName: "byCompany", fields: ["id"])
+  customers: [Customer] @hasMany(indexName: "byCompany", fields: ["id"])
+  categories: [Category] @hasMany(indexName: "byCompany", fields: ["id"])
+  subcategories: [Subcategory]
+    @hasMany(indexName: "byCompany", fields: ["id"])
+  bills: [Bill] @hasMany(indexName: "byCompany", fields: ["id"])
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+}
+
+
+
+type Product
+  @model
+  @auth(
+    rules: [
+      {
+        allow: groups
+        groups: ["SUPERADMIN", "ADMIN", "VAIBHAV"]
+        operations: [create, update, delete, read]
+      }
+      { allow: groups, groups: ["STAFF"], operations: [read] }
+    ]
+  ) {
+  id: ID!
+  companyId: ID!
+    @index(
+      name: "byCompany"
+      sortKeyFields: ["name"]
+      queryField: "productsByCompany"
+    )
+  categoryId: ID
+    @index(
+      name: "byCategory"
+      sortKeyFields: ["name"]
+      queryField: "productsByCategory"
+    )
+  subcategoryId: ID
+    @index(
+      name: "bySubcategory"
+      sortKeyFields: ["name"]
+      queryField: "productsBySubcategory"
+    )
+  name: String!
+  sku: String
+  description: String
+  unitPrice: Float @default(value: "0.0")
+  unitCost: Float
+  isActive: Boolean!
+  company: Company @belongsTo(fields: ["companyId"])
+  billItems: [BillItem] @hasMany(indexName: "byProduct", fields: ["id"])
+  category: Category @belongsTo(fields: ["categoryId"])
+  subcategory: Subcategory @belongsTo(fields: ["subcategoryId"])
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+}
+
+type Category
+  @model
+  @auth(
+    rules: [
+      {
+        allow: groups
+        groups: ["SUPERADMIN", "ADMIN", "VAIBHAV"]
+        operations: [create, update, delete, read]
+      }
+      { allow: groups, groups: ["STAFF"], operations: [read] }
+    ]
+  ) {
+  id: ID!
+  companyId: ID!
+    @index(
+      name: "byCompany"
+      sortKeyFields: ["name"]
+      queryField: "categoriesByCompany"
+    )
+  name: String!
+  description: String
+  company: Company @belongsTo(fields: ["companyId"])
+  subcategories: [Subcategory]
+    @hasMany(indexName: "byCategory", fields: ["id"])
+  products: [Product] @hasMany(indexName: "byCategory", fields: ["id"])
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+}
+
+type Subcategory
+  @model
+  @auth(
+    rules: [
+      {
+        allow: groups
+        groups: ["SUPERADMIN", "ADMIN", "VAIBHAV"]
+        operations: [create, update, delete, read]
+      }
+      { allow: groups, groups: ["STAFF"], operations: [read] }
+    ]
+  ) {
+  id: ID!
+  companyId: ID!
+    @index(
+      name: "byCompany"
+      sortKeyFields: ["name"]
+      queryField: "subcategoriesByCompany"
+    )
+  categoryId: ID!
+    @index(
+      name: "byCategory"
+      sortKeyFields: ["name"]
+      queryField: "subcategoriesByCategory"
+    )
+  name: String!
+  description: String
+  company: Company @belongsTo(fields: ["companyId"])
+  category: Category @belongsTo(fields: ["categoryId"])
+  products: [Product] @hasMany(indexName: "bySubcategory", fields: ["id"])
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+}
+
+type Bill
+  @model
+  @auth(
+    rules: [
+      {
+        allow: groups
+        groups: ["SUPERADMIN", "ADMIN", "VAIBHAV"]
+        operations: [create, update, delete, read]
+      }
+      { allow: groups, groups: ["STAFF"], operations: [read] }
+    ]
+  ) {
+  id: ID!
+  companyId: ID!
+    @index(
+      name: "byCompany"
+      sortKeyFields: ["billedAt"]
+      queryField: "billsByCompany"
+    )
+  billType: BillType!
+  billedAt: AWSDateTime!
+  status: BillStatus!
+  totalAmount: Float!
+  customerId: ID
+    @index(
+      name: "byCustomer"
+      sortKeyFields: ["billedAt"]
+      queryField: "billsByCustomer"
+    )
+  notes: String
+  company: Company @belongsTo(fields: ["companyId"])
+  customer: Customer @belongsTo(fields: ["customerId"])
+  items: [BillItem] @hasMany(indexName: "byBill", fields: ["id"])
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+}
+
+type BillItem
+  @model
+  @auth(
+    rules: [
+      {
+        allow: groups
+        groups: ["SUPERADMIN", "ADMIN", "VAIBHAV"]
+        operations: [create, update, delete, read]
+      }
+      { allow: groups, groups: ["STAFF"], operations: [read] }
+    ]
+  ) {
+  id: ID!
+  billId: ID!
+    @index(
+      name: "byBill"
+      sortKeyFields: ["lineNumber"]
+      queryField: "billItemsByBill"
+    )
+  lineNumber: Int!
+  description: String
+  productId: ID
+    @index(
+      name: "byProduct"
+      sortKeyFields: ["billId"]
+      queryField: "billItemsByProduct"
+    )
+  quantity: Int
+  unitPrice: Float
+  lineTotal: Float
+  bill: Bill @belongsTo(fields: ["billId"])
+  product: Product @belongsTo(fields: ["productId"])
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+}
