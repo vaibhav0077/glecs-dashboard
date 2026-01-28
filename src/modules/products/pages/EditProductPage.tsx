@@ -45,6 +45,7 @@ type Product = {
   description?: string | null;
   unitPrice?: number | null;
   unitCost?: number | null;
+  stockQuantity?: number | null;
   isActive: boolean;
   categoryId?: string | null;
   subcategoryId?: string | null;
@@ -109,6 +110,7 @@ export function EditProductPage() {
         description: product.description || undefined,
         unitPrice: product.unitPrice ?? 0,
         unitCost: product.unitCost || undefined,
+        stockQuantity: product.stockQuantity || undefined,
         categoryId: product.categoryId || undefined,
         subcategoryId: product.subcategoryId || undefined,
         isActive: product.isActive ?? true,
@@ -182,6 +184,7 @@ export function EditProductPage() {
     description?: string;
     unitPrice?: number;
     unitCost?: number;
+    stockQuantity?: number;
     isActive: boolean;
     categoryId?: string;
     subcategoryId?: string;
@@ -204,6 +207,7 @@ export function EditProductPage() {
             description: values.description || undefined,
             unitPrice: values.unitPrice ?? 0,
             unitCost: values.unitCost || undefined,
+            stockQuantity: values.stockQuantity || undefined,
             isActive: values.isActive ?? true,
             categoryId: values.categoryId || undefined,
             subcategoryId: values.subcategoryId || undefined,
@@ -318,6 +322,14 @@ export function EditProductPage() {
               />
             </Form.Item>
           </Space>
+
+          <Form.Item label="Stock Quantity" name="stockQuantity">
+            <InputNumber
+              min={0}
+              style={{ width: "100%" }}
+              placeholder="Enter stock quantity (optional)"
+            />
+          </Form.Item>
 
           <Form.Item
             label="Category"

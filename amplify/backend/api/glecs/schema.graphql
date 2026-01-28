@@ -156,6 +156,7 @@ type Product
   description: String
   unitPrice: Float @default(value: "0.0")
   unitCost: Float
+  stockQuantity: Int
   isActive: Boolean!
   company: Company @belongsTo(fields: ["companyId"])
   billItems: [BillItem] @hasMany(indexName: "byProduct", fields: ["id"])

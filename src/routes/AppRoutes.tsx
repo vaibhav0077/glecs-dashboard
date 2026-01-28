@@ -22,6 +22,8 @@ import { SalesBillsPage } from "../modules/bills/pages/SalesBillsPage";
 import { PurchaseBillsPage } from "../modules/bills/pages/PurchaseBillsPage";
 import { AddSalesBillPage } from "../modules/bills/pages/AddSalesBillPage";
 import { AddPurchaseBillPage } from "../modules/bills/pages/AddPurchaseBillPage";
+import { EditSalesBillPage } from "../modules/bills/pages/EditSalesBillPage";
+import { EditPurchaseBillPage } from "../modules/bills/pages/EditPurchaseBillPage";
 import { InventoryPage } from "../modules/inventory/pages/InventoryPage";
 
 type GuardProps = {
@@ -232,6 +234,14 @@ export function AppRoutes() {
           }
         />
         <Route
+          path={`${APP_ROUTES.billsSales}/edit/:id`}
+          element={
+            <CompanyGuard>
+              <EditSalesBillPage />
+            </CompanyGuard>
+          }
+        />
+        <Route
           path={APP_ROUTES.billsPurchase}
           element={
             <CompanyGuard>
@@ -244,6 +254,14 @@ export function AppRoutes() {
           element={
             <CompanyGuard>
               <AddPurchaseBillPage />
+            </CompanyGuard>
+          }
+        />
+        <Route
+          path={`${APP_ROUTES.billsPurchase}/edit/:id`}
+          element={
+            <CompanyGuard>
+              <EditPurchaseBillPage />
             </CompanyGuard>
           }
         />

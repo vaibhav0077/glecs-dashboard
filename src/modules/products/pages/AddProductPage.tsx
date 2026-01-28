@@ -134,6 +134,7 @@ export function AddProductPage() {
     description?: string;
     unitPrice?: number;
     unitCost?: number;
+    stockQuantity?: number;
     isActive: boolean;
     categoryId?: string;
     subcategoryId?: string;
@@ -155,6 +156,7 @@ export function AddProductPage() {
             description: values.description || undefined,
             unitPrice: values.unitPrice ?? 0,
             unitCost: values.unitCost || undefined,
+            stockQuantity: values.stockQuantity || undefined,
             isActive: values.isActive ?? true,
             categoryId: values.categoryId || undefined,
             subcategoryId: values.subcategoryId || undefined,
@@ -255,6 +257,14 @@ export function AddProductPage() {
                   />
                 </Form.Item>
               </Space>
+
+              <Form.Item label="Stock Quantity" name="stockQuantity">
+                <InputNumber
+                  min={0}
+                  style={{ width: "100%" }}
+                  placeholder="Enter stock quantity (optional)"
+                />
+              </Form.Item>
 
               <Form.Item
                 label="Category"

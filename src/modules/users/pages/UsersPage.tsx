@@ -42,27 +42,27 @@ export function UsersPage() {
     let active = true;
     setLoading(true);
     const client = generateClient();
-    client
-      .graphql({
-        query: usersByCompanyQuery,
-        variables: { companyId: selectedCompany.id },
-        authMode: "userPool",
-      })
-      .then((response: unknown) => {
+    (async () => {
+      try {
+        const response = await client.graphql({
+          query: usersByCompanyQuery,
+          variables: { companyId: selectedCompany.id },
+          authMode: "userPool",
+        });
         const data = response as { data?: { userCompanyConnectionsByCompanyId?: { items: UserCompanyConnectionItem[] } } };
         const items = data.data?.userCompanyConnectionsByCompanyId?.items ?? [];
         if (active) {
           setUsers(items.map(connectionToUser));
+          setLoading(false);
         }
-      })
-      .catch((error: any) => {
+      } catch (error: any) {
         console.error("Error loading users:", error);
         // If index doesn't exist, try fallback query
         if (error?.errors?.[0]?.message?.includes("index") || error?.errors?.[0]?.message?.includes("byCompany")) {
           console.warn("Index not found, using fallback query");
           // Fallback: use listUserCompanyConnections with filter
-          client
-            .graphql({
+          try {
+            const fallbackResponse = await client.graphql({
               query: `query ListUserCompanyConnections($filter: ModelUserCompanyConnectionFilterInput) {
                 listUserCompanyConnections(filter: $filter) {
                   items {
@@ -83,28 +83,26 @@ export function UsersPage() {
                 filter: { companyId: { eq: selectedCompany.id } },
               },
               authMode: "userPool",
-            })
-            .then((fallbackResponse: unknown) => {
-              const fallbackData = fallbackResponse as {
-                data?: {
-                  listUserCompanyConnections?: { items: UserCompanyConnectionItem[] };
-                };
-              };
-              const items =
-                fallbackData.data?.listUserCompanyConnections?.items ?? [];
-              if (active) {
-                setUsers(items.map(connectionToUser));
-                setLoading(false);
-              }
-            })
-            .catch((fallbackError) => {
-              console.error("Fallback query also failed:", fallbackError);
-              if (active) {
-                setUsers([]);
-                setLoading(false);
-                message.error("Failed to load users. Please run 'amplify push' to update the database schema.");
-              }
             });
+            const fallbackData = fallbackResponse as {
+              data?: {
+                listUserCompanyConnections?: { items: UserCompanyConnectionItem[] };
+              };
+            };
+            const items =
+              fallbackData.data?.listUserCompanyConnections?.items ?? [];
+            if (active) {
+              setUsers(items.map(connectionToUser));
+              setLoading(false);
+            }
+          } catch (fallbackError: any) {
+            console.error("Fallback query also failed:", fallbackError);
+            if (active) {
+              setUsers([]);
+              setLoading(false);
+              message.error("Failed to load users. Please run 'amplify push' to update the database schema.");
+            }
+          }
         } else {
           if (active) {
             setUsers([]);
@@ -112,29 +110,31 @@ export function UsersPage() {
             message.error("Failed to load users");
           }
         }
-      });
+      }
+    })();
     return () => {
       active = false;
     };
   }, [selectedCompany?.id]);
 
-  const handleInviteSuccess = () => {
+  const handleInviteSuccess = async () => {
     if (!selectedCompany?.id) return;
     setLoading(true);
     const client = generateClient();
-    client
-      .graphql({
+    try {
+      const response = await client.graphql({
         query: usersByCompanyQuery,
         variables: { companyId: selectedCompany.id },
         authMode: "userPool",
-      })
-      .then((response: unknown) => {
-        const data = response as { data?: { userCompanyConnectionsByCompanyId?: { items: UserCompanyConnectionItem[] } } };
-        const items = data.data?.userCompanyConnectionsByCompanyId?.items ?? [];
-        setUsers(items.map(connectionToUser));
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
+      });
+      const data = response as { data?: { userCompanyConnectionsByCompanyId?: { items: UserCompanyConnectionItem[] } } };
+      const items = data.data?.userCompanyConnectionsByCompanyId?.items ?? [];
+      setUsers(items.map(connectionToUser));
+    } catch {
+      // Ignore errors
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!selectedCompany) {

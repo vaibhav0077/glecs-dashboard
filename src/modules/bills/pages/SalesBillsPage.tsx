@@ -16,7 +16,7 @@ import {
 import { PlusOutlined, EditOutlined, DollarOutlined } from "@ant-design/icons";
 import { useAppSelector } from "../../../store/hooks";
 import { generateClient } from "aws-amplify/api";
-import { billsByCompanyQuery, deleteBillMutation } from "../queries";
+import { billsByCompanyQuery } from "../queries";
 import { APP_ROUTES } from "../../../constants/routes";
 
 const { Title, Text } = Typography;
@@ -80,22 +80,6 @@ export function SalesBillsPage() {
       setBills([]);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleDelete = async (id: string) => {
-    try {
-      const client = generateClient();
-      await client.graphql({
-        query: deleteBillMutation,
-        variables: { input: { id } },
-        authMode: "userPool",
-      });
-      message.success("Bill deleted");
-      loadBills();
-    } catch (e) {
-      console.error(e);
-      message.error("Failed to delete bill");
     }
   };
 

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   Button,
   Card,
@@ -15,16 +15,22 @@ import {
   Col,
   message,
   Divider,
+  Spin,
   Empty,
 } from "antd";
 import { ArrowLeftOutlined, PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useAppSelector } from "../../../store/hooks";
 import { generateClient } from "aws-amplify/api";
 import {
-  createBillMutation,
+  getBillQuery,
+  billItemsByBillQuery,
+  updateBillMutation,
   createBillItemMutation,
+  updateBillItemMutation,
+  deleteBillItemMutation,
 } from "../queries";
 import { productsByCompanyQuery } from "../../products/queries";
+import { customersByCompanyQuery } from "../../customers/queries";
 import { APP_ROUTES } from "../../../constants/routes";
 import dayjs from "dayjs";
 import type { Dayjs } from "dayjs";
@@ -41,31 +47,66 @@ type Product = {
   isActive: boolean;
 };
 
+type Customer = {
+  id: string;
+  name: string;
+  email?: string | null;
+};
+
 type BillItemForm = {
+  id?: string;
   productId?: string;
   description?: string;
   quantity?: number;
   unitPrice?: number;
   lineTotal?: number;
+  lineNumber?: number;
 };
 
-export function AddPurchaseBillPage() {
+type BillItem = {
+  id: string;
+  productId?: string | null;
+  description?: string | null;
+  quantity?: number | null;
+  unitPrice?: number | null;
+  lineTotal?: number | null;
+  lineNumber: number;
+};
+
+export function EditSalesBillPage() {
   const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
   const { selectedCompany } = useAppSelector((state) => state.company);
   const [form] = Form.useForm();
   const [submitting, setSubmitting] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState<Product[]>([]);
+  const [customers, setCustomers] = useState<Customer[]>([]);
   const [items, setItems] = useState<BillItemForm[]>([]);
+  const [existingItemIds, setExistingItemIds] = useState<Set<string>>(new Set());
   const [datePickerOpen, setDatePickerOpen] = useState(false);
+  const [customerSelectOpen, setCustomerSelectOpen] = useState(false);
   const [productSelectOpenIndex, setProductSelectOpenIndex] = useState<number | null>(null);
-  const addItemButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    if (selectedCompany) {
-      loadProducts();
-      form.setFieldsValue({ billedAt: dayjs() });
+    if (selectedCompany && id) {
+      loadData();
     }
-  }, [selectedCompany]);
+  }, [selectedCompany, id]);
+
+  const loadData = async () => {
+    if (!selectedCompany || !id) return;
+    setLoading(true);
+    try {
+      const client = generateClient();
+      await Promise.all([loadProducts(), loadCustomers(), loadBill()]);
+    } catch (e) {
+      console.error(e);
+      message.error("Failed to load bill data");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const loadProducts = async () => {
     if (!selectedCompany) return;
@@ -84,6 +125,85 @@ export function AddPurchaseBillPage() {
       setProducts(res.data?.productsByCompany?.items ?? []);
     } catch (e) {
       console.error(e);
+    }
+  };
+
+  const loadCustomers = async () => {
+    if (!selectedCompany) return;
+    try {
+      const client = generateClient();
+      const res = (await client.graphql({
+        query: customersByCompanyQuery,
+        variables: { companyId: selectedCompany.id },
+        authMode: "userPool",
+      })) as {
+        data?: { customersByCompany?: { items: Customer[] } };
+      };
+      setCustomers(res.data?.customersByCompany?.items ?? []);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const loadBill = async () => {
+    if (!id) return;
+    try {
+      const client = generateClient();
+      const [billRes, itemsRes] = await Promise.all([
+        client.graphql({
+          query: getBillQuery,
+          variables: { id },
+          authMode: "userPool",
+        }) as Promise<{
+          data?: {
+            getBill?: {
+              id: string;
+              billedAt: string;
+              customerId?: string | null;
+              notes?: string | null;
+            };
+          };
+        }>,
+        client.graphql({
+          query: billItemsByBillQuery,
+          variables: { billId: id },
+          authMode: "userPool",
+        }) as Promise<{
+          data?: { billItemsByBill?: { items: BillItem[] } };
+        }>,
+      ]);
+
+      const bill = billRes.data?.getBill;
+      if (!bill) {
+        message.error("Bill not found");
+        navigate(APP_ROUTES.billsSales);
+        return;
+      }
+
+      form.setFieldsValue({
+        billedAt: dayjs(bill.billedAt),
+        customerId: bill.customerId,
+        notes: bill.notes,
+      });
+
+      const lineItems = itemsRes.data?.billItemsByBill?.items ?? [];
+      const formattedItems: BillItemForm[] = lineItems
+        .sort((a, b) => a.lineNumber - b.lineNumber)
+        .map((item) => ({
+          id: item.id,
+          productId: item.productId ?? undefined,
+          description: item.description ?? undefined,
+          quantity: item.quantity ?? undefined,
+          unitPrice: item.unitPrice ?? undefined,
+          lineTotal: item.lineTotal ?? undefined,
+          lineNumber: item.lineNumber,
+        }));
+
+      setItems(formattedItems);
+      setExistingItemIds(new Set(formattedItems.map((item) => item.id!).filter(Boolean)));
+    } catch (e) {
+      console.error(e);
+      message.error("Failed to load bill");
     }
   };
 
@@ -112,7 +232,7 @@ export function AddPurchaseBillPage() {
     if (field === "productId") {
       const product = products.find((p) => p.id === value);
       if (product) {
-        item.unitPrice = product.unitCost ?? product.unitPrice ?? 0;
+        item.unitPrice = product.unitPrice ?? 0;
         if (!item.quantity) item.quantity = 1;
       }
     }
@@ -131,9 +251,10 @@ export function AddPurchaseBillPage() {
 
   const handleSubmit = async (values: {
     billedAt: Dayjs;
+    customerId?: string;
     notes?: string;
   }) => {
-    if (!selectedCompany) return;
+    if (!selectedCompany || !id) return;
     if (items.length === 0) {
       message.error("Please add at least one item");
       return;
@@ -144,29 +265,29 @@ export function AddPurchaseBillPage() {
       const client = generateClient();
 
       const billInput: any = {
+        id,
         companyId: selectedCompany.id,
-        billType: "PURCHASE",
+        billType: "SALE",
         billedAt: values.billedAt.toISOString(),
         status: "DRAFT",
         totalAmount: totalAmount,
       };
+      if (values.customerId) billInput.customerId = values.customerId;
       if (values.notes?.trim()) billInput.notes = values.notes.trim();
 
-      const billRes = (await client.graphql({
-        query: createBillMutation,
+      await client.graphql({
+        query: updateBillMutation,
         variables: { input: billInput },
         authMode: "userPool",
-      })) as { data?: { createBill?: { id: string } } };
+      });
 
-      const billId = billRes.data?.createBill?.id;
-      if (!billId) throw new Error("Failed to create bill");
-
+      const itemsToDelete = new Set(existingItemIds);
       for (let i = 0; i < items.length; i++) {
         const item = items[i];
         if (!item.productId || !item.quantity || !item.unitPrice) continue;
 
         const itemInput: any = {
-          billId,
+          billId: id,
           lineNumber: i + 1,
           productId: item.productId,
           quantity: item.quantity,
@@ -175,18 +296,36 @@ export function AddPurchaseBillPage() {
         };
         if (item.description?.trim()) itemInput.description = item.description.trim();
 
+        if (item.id && existingItemIds.has(item.id)) {
+          itemInput.id = item.id;
+          await client.graphql({
+            query: updateBillItemMutation,
+            variables: { input: itemInput },
+            authMode: "userPool",
+          });
+          itemsToDelete.delete(item.id);
+        } else {
+          await client.graphql({
+            query: createBillItemMutation,
+            variables: { input: itemInput },
+            authMode: "userPool",
+          });
+        }
+      }
+
+      for (const itemId of itemsToDelete) {
         await client.graphql({
-          query: createBillItemMutation,
-          variables: { input: itemInput },
+          query: deleteBillItemMutation,
+          variables: { input: { id: itemId } },
           authMode: "userPool",
         });
       }
 
-      message.success("Purchase bill created successfully");
-      navigate(APP_ROUTES.billsPurchase);
+      message.success("Sales bill updated successfully");
+      navigate(APP_ROUTES.billsSales);
     } catch (e: any) {
       console.error(e);
-      message.error(e.message || "Failed to create purchase bill");
+      message.error(e.message || "Failed to update sales bill");
     } finally {
       setSubmitting(false);
     }
@@ -263,7 +402,9 @@ export function AddPurchaseBillPage() {
       key: "lineTotal",
       width: 120,
       render: (_: unknown, _item: unknown, index: number) => (
-        <Text strong>₹{Number(items[index]?.lineTotal ?? 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}</Text>
+        <Text strong>
+          ₹{Number(items[index]?.lineTotal ?? 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+        </Text>
       ),
     },
     {
@@ -289,6 +430,16 @@ export function AddPurchaseBillPage() {
     );
   }
 
+  if (loading) {
+    return (
+      <Card>
+        <div style={{ textAlign: "center", padding: 48 }}>
+          <Spin size="large" />
+        </div>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <Space direction="vertical" size="large" style={{ width: "100%" }}>
@@ -296,14 +447,14 @@ export function AddPurchaseBillPage() {
           <Col>
             <Button
               icon={<ArrowLeftOutlined />}
-              onClick={() => navigate(APP_ROUTES.billsPurchase)}
+              onClick={() => navigate(APP_ROUTES.billsSales)}
             >
               Back
             </Button>
           </Col>
           <Col flex={1}>
             <Title level={3} style={{ margin: 0 }}>
-              Add Purchase Bill
+              Edit Sales Bill
             </Title>
           </Col>
         </Row>
@@ -322,11 +473,27 @@ export function AddPurchaseBillPage() {
                   open={datePickerOpen}
                   onOpenChange={setDatePickerOpen}
                   onFocus={() => setDatePickerOpen(true)}
-                  autoFocus
                 />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12} md={8}>
+              <Form.Item name="customerId" label="Customer">
+                <Select
+                  placeholder="Select customer"
+                  showSearch
+                  optionFilterProp="label"
+                  allowClear
+                  open={customerSelectOpen}
+                  onDropdownVisibleChange={setCustomerSelectOpen}
+                  onFocus={() => setCustomerSelectOpen(true)}
+                  options={customers.map((c) => ({
+                    label: c.name,
+                    value: c.id,
+                  }))}
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={24} md={8}>
               <Form.Item label="Total Amount">
                 <Text strong style={{ fontSize: 18, color: "#1890ff" }}>
                   ₹{totalAmount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
@@ -343,7 +510,7 @@ export function AddPurchaseBillPage() {
                 dataSource={items}
                 columns={itemColumns}
                 pagination={false}
-                rowKey={(_, index) => (index ?? 0).toString()}
+                rowKey={(_, index) => items[index ?? 0]?.id ?? (index ?? 0).toString()}
                 summary={() => (
                   <Table.Summary fixed>
                     <Table.Summary.Row>
@@ -363,7 +530,6 @@ export function AddPurchaseBillPage() {
             </div>
 
             <Button
-              ref={addItemButtonRef}
               type="dashed"
               icon={<PlusOutlined />}
               onClick={addItem}
@@ -385,9 +551,9 @@ export function AddPurchaseBillPage() {
                 loading={submitting}
                 disabled={items.length === 0}
               >
-                Create Bill
+                Update Bill
               </Button>
-              <Button onClick={() => navigate(APP_ROUTES.billsPurchase)}>
+              <Button onClick={() => navigate(APP_ROUTES.billsSales)}>
                 Cancel
               </Button>
             </Space>

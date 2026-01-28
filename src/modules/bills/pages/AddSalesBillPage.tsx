@@ -15,6 +15,7 @@ import {
   Col,
   message,
   Divider,
+  Empty,
 } from "antd";
 import { ArrowLeftOutlined, PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useAppSelector } from "../../../store/hooks";
@@ -389,7 +390,7 @@ export function AddSalesBillPage() {
                 dataSource={items}
                 columns={itemColumns}
                 pagination={false}
-                rowKey={(_, index) => index.toString()}
+                rowKey={(_, index) => (index ?? 0).toString()}
                 summary={() => (
                   <Table.Summary fixed>
                     <Table.Summary.Row>
