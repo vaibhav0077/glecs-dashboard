@@ -1,6 +1,50 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const getUserProfile = /* GraphQL */ `
+  query GetUserProfile($email: AWSEmail!) {
+    getUserProfile(email: $email) {
+      email
+      name
+      phone
+      companies {
+        nextToken
+        __typename
+      }
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const listUserProfiles = /* GraphQL */ `
+  query ListUserProfiles(
+    $email: AWSEmail
+    $filter: ModelUserProfileFilterInput
+    $limit: Int
+    $nextToken: String
+    $sortDirection: ModelSortDirection
+  ) {
+    listUserProfiles(
+      email: $email
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+      sortDirection: $sortDirection
+    ) {
+      items {
+        email
+        name
+        phone
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
 export const getCustomer = /* GraphQL */ `
   query GetCustomer($id: ID!) {
     getCustomer(id: $id) {
@@ -51,6 +95,45 @@ export const listCustomers = /* GraphQL */ `
     $nextToken: String
   ) {
     listCustomers(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        companyId
+        name
+        email
+        phone
+        addressLine1
+        addressLine2
+        city
+        state
+        postalCode
+        country
+        notes
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const customersByCompany = /* GraphQL */ `
+  query CustomersByCompany(
+    $companyId: ID!
+    $name: ModelStringKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelCustomerFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    customersByCompany(
+      companyId: $companyId
+      name: $name
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
       items {
         id
         companyId
@@ -236,323 +319,6 @@ export const listProducts = /* GraphQL */ `
     }
   }
 `;
-export const getCategory = /* GraphQL */ `
-  query GetCategory($id: ID!) {
-    getCategory(id: $id) {
-      id
-      companyId
-      name
-      description
-      company {
-        id
-        name
-        legalName
-        description
-        website
-        phone
-        addressLine1
-        addressLine2
-        city
-        state
-        postalCode
-        country
-        isActive
-        createdAt
-        updatedAt
-        __typename
-      }
-      subcategories {
-        nextToken
-        __typename
-      }
-      products {
-        nextToken
-        __typename
-      }
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const listCategories = /* GraphQL */ `
-  query ListCategories(
-    $filter: ModelCategoryFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    listCategories(filter: $filter, limit: $limit, nextToken: $nextToken) {
-      items {
-        id
-        companyId
-        name
-        description
-        createdAt
-        updatedAt
-        __typename
-      }
-      nextToken
-      __typename
-    }
-  }
-`;
-export const getSubcategory = /* GraphQL */ `
-  query GetSubcategory($id: ID!) {
-    getSubcategory(id: $id) {
-      id
-      companyId
-      categoryId
-      name
-      description
-      company {
-        id
-        name
-        legalName
-        description
-        website
-        phone
-        addressLine1
-        addressLine2
-        city
-        state
-        postalCode
-        country
-        isActive
-        createdAt
-        updatedAt
-        __typename
-      }
-      category {
-        id
-        companyId
-        name
-        description
-        createdAt
-        updatedAt
-        __typename
-      }
-      products {
-        nextToken
-        __typename
-      }
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const listSubcategories = /* GraphQL */ `
-  query ListSubcategories(
-    $filter: ModelSubcategoryFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    listSubcategories(filter: $filter, limit: $limit, nextToken: $nextToken) {
-      items {
-        id
-        companyId
-        categoryId
-        name
-        description
-        createdAt
-        updatedAt
-        __typename
-      }
-      nextToken
-      __typename
-    }
-  }
-`;
-export const getBill = /* GraphQL */ `
-  query GetBill($id: ID!) {
-    getBill(id: $id) {
-      id
-      companyId
-      billType
-      billedAt
-      status
-      totalAmount
-      customerId
-      notes
-      company {
-        id
-        name
-        legalName
-        description
-        website
-        phone
-        addressLine1
-        addressLine2
-        city
-        state
-        postalCode
-        country
-        isActive
-        createdAt
-        updatedAt
-        __typename
-      }
-      customer {
-        id
-        companyId
-        name
-        email
-        phone
-        addressLine1
-        addressLine2
-        city
-        state
-        postalCode
-        country
-        notes
-        createdAt
-        updatedAt
-        __typename
-      }
-      items {
-        nextToken
-        __typename
-      }
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const listBills = /* GraphQL */ `
-  query ListBills(
-    $filter: ModelBillFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    listBills(filter: $filter, limit: $limit, nextToken: $nextToken) {
-      items {
-        id
-        companyId
-        billType
-        billedAt
-        status
-        totalAmount
-        customerId
-        notes
-        createdAt
-        updatedAt
-        __typename
-      }
-      nextToken
-      __typename
-    }
-  }
-`;
-export const getBillItem = /* GraphQL */ `
-  query GetBillItem($id: ID!) {
-    getBillItem(id: $id) {
-      id
-      billId
-      lineNumber
-      description
-      productId
-      quantity
-      unitPrice
-      lineTotal
-      bill {
-        id
-        companyId
-        billType
-        billedAt
-        status
-        totalAmount
-        customerId
-        notes
-        createdAt
-        updatedAt
-        __typename
-      }
-      product {
-        id
-        companyId
-        categoryId
-        subcategoryId
-        name
-        sku
-        description
-        unitPrice
-        unitCost
-        isActive
-        createdAt
-        updatedAt
-        __typename
-      }
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const listBillItems = /* GraphQL */ `
-  query ListBillItems(
-    $filter: ModelBillItemFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    listBillItems(filter: $filter, limit: $limit, nextToken: $nextToken) {
-      items {
-        id
-        billId
-        lineNumber
-        description
-        productId
-        quantity
-        unitPrice
-        lineTotal
-        createdAt
-        updatedAt
-        __typename
-      }
-      nextToken
-      __typename
-    }
-  }
-`;
-export const customersByCompany = /* GraphQL */ `
-  query CustomersByCompany(
-    $companyId: ID!
-    $name: ModelStringKeyConditionInput
-    $sortDirection: ModelSortDirection
-    $filter: ModelCustomerFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    customersByCompany(
-      companyId: $companyId
-      name: $name
-      sortDirection: $sortDirection
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-    ) {
-      items {
-        id
-        companyId
-        name
-        email
-        phone
-        addressLine1
-        addressLine2
-        city
-        state
-        postalCode
-        country
-        notes
-        createdAt
-        updatedAt
-        __typename
-      }
-      nextToken
-      __typename
-    }
-  }
-`;
 export const productsByCompany = /* GraphQL */ `
   query ProductsByCompany(
     $companyId: ID!
@@ -664,6 +430,66 @@ export const productsBySubcategory = /* GraphQL */ `
     }
   }
 `;
+export const getCategory = /* GraphQL */ `
+  query GetCategory($id: ID!) {
+    getCategory(id: $id) {
+      id
+      companyId
+      name
+      description
+      company {
+        id
+        name
+        legalName
+        description
+        website
+        phone
+        addressLine1
+        addressLine2
+        city
+        state
+        postalCode
+        country
+        isActive
+        createdAt
+        updatedAt
+        __typename
+      }
+      subcategories {
+        nextToken
+        __typename
+      }
+      products {
+        nextToken
+        __typename
+      }
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const listCategories = /* GraphQL */ `
+  query ListCategories(
+    $filter: ModelCategoryFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listCategories(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        companyId
+        name
+        description
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
 export const categoriesByCompany = /* GraphQL */ `
   query CategoriesByCompany(
     $companyId: ID!
@@ -684,6 +510,73 @@ export const categoriesByCompany = /* GraphQL */ `
       items {
         id
         companyId
+        name
+        description
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const getSubcategory = /* GraphQL */ `
+  query GetSubcategory($id: ID!) {
+    getSubcategory(id: $id) {
+      id
+      companyId
+      categoryId
+      name
+      description
+      company {
+        id
+        name
+        legalName
+        description
+        website
+        phone
+        addressLine1
+        addressLine2
+        city
+        state
+        postalCode
+        country
+        isActive
+        createdAt
+        updatedAt
+        __typename
+      }
+      category {
+        id
+        companyId
+        name
+        description
+        createdAt
+        updatedAt
+        __typename
+      }
+      products {
+        nextToken
+        __typename
+      }
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const listSubcategories = /* GraphQL */ `
+  query ListSubcategories(
+    $filter: ModelSubcategoryFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listSubcategories(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        companyId
+        categoryId
         name
         description
         createdAt
@@ -750,6 +643,87 @@ export const subcategoriesByCategory = /* GraphQL */ `
         categoryId
         name
         description
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
+export const getBill = /* GraphQL */ `
+  query GetBill($id: ID!) {
+    getBill(id: $id) {
+      id
+      companyId
+      billType
+      billedAt
+      status
+      totalAmount
+      customerId
+      notes
+      company {
+        id
+        name
+        legalName
+        description
+        website
+        phone
+        addressLine1
+        addressLine2
+        city
+        state
+        postalCode
+        country
+        isActive
+        createdAt
+        updatedAt
+        __typename
+      }
+      customer {
+        id
+        companyId
+        name
+        email
+        phone
+        addressLine1
+        addressLine2
+        city
+        state
+        postalCode
+        country
+        notes
+        createdAt
+        updatedAt
+        __typename
+      }
+      items {
+        nextToken
+        __typename
+      }
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const listBills = /* GraphQL */ `
+  query ListBills(
+    $filter: ModelBillFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listBills(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        companyId
+        billType
+        billedAt
+        status
+        totalAmount
+        customerId
+        notes
         createdAt
         updatedAt
         __typename
@@ -829,6 +803,76 @@ export const billsByCustomer = /* GraphQL */ `
     }
   }
 `;
+export const getBillItem = /* GraphQL */ `
+  query GetBillItem($id: ID!) {
+    getBillItem(id: $id) {
+      id
+      billId
+      lineNumber
+      description
+      productId
+      quantity
+      unitPrice
+      lineTotal
+      bill {
+        id
+        companyId
+        billType
+        billedAt
+        status
+        totalAmount
+        customerId
+        notes
+        createdAt
+        updatedAt
+        __typename
+      }
+      product {
+        id
+        companyId
+        categoryId
+        subcategoryId
+        name
+        sku
+        description
+        unitPrice
+        unitCost
+        isActive
+        createdAt
+        updatedAt
+        __typename
+      }
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const listBillItems = /* GraphQL */ `
+  query ListBillItems(
+    $filter: ModelBillItemFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listBillItems(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        billId
+        lineNumber
+        description
+        productId
+        quantity
+        unitPrice
+        lineTotal
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;
 export const billItemsByBill = /* GraphQL */ `
   query BillItemsByBill(
     $billId: ID!
@@ -890,50 +934,6 @@ export const billItemsByProduct = /* GraphQL */ `
         quantity
         unitPrice
         lineTotal
-        createdAt
-        updatedAt
-        __typename
-      }
-      nextToken
-      __typename
-    }
-  }
-`;
-export const getUserProfile = /* GraphQL */ `
-  query GetUserProfile($email: AWSEmail!) {
-    getUserProfile(email: $email) {
-      email
-      name
-      phone
-      companies {
-        nextToken
-        __typename
-      }
-      createdAt
-      updatedAt
-      __typename
-    }
-  }
-`;
-export const listUserProfiles = /* GraphQL */ `
-  query ListUserProfiles(
-    $email: AWSEmail
-    $filter: ModelUserProfileFilterInput
-    $limit: Int
-    $nextToken: String
-    $sortDirection: ModelSortDirection
-  ) {
-    listUserProfiles(
-      email: $email
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-      sortDirection: $sortDirection
-    ) {
-      items {
-        email
-        name
-        phone
         createdAt
         updatedAt
         __typename
@@ -1055,12 +1055,6 @@ export const userCompanyConnectionsByCompanyId = /* GraphQL */ `
         id
         userProfileEmail
         companyId
-        userProfile {
-          email
-          name
-          phone
-          __typename
-        }
         createdAt
         updatedAt
         email

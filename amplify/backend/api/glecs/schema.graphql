@@ -21,7 +21,7 @@ type UserProfile
   @model(subscriptions: null)
   @auth(
     rules: [
-       {
+      {
         allow: private
         provider: iam
         operations: [create, read, update, delete]
@@ -45,8 +45,7 @@ type UserProfile
   email: AWSEmail! @primaryKey
   name: String
   phone: AWSPhone
-  companies: [Company]
-    @manyToMany(relationName: "UserCompanyConnection")
+  companies: [Company] @manyToMany(relationName: "UserCompanyConnection")
   createdAt: AWSDateTime
   updatedAt: AWSDateTime
 }
@@ -111,19 +110,15 @@ type Company
   postalCode: String
   country: String
   isActive: Boolean!
-  users: [UserProfile]
-    @manyToMany(relationName: "UserCompanyConnection")
+  users: [UserProfile] @manyToMany(relationName: "UserCompanyConnection")
   products: [Product] @hasMany(indexName: "byCompany", fields: ["id"])
   customers: [Customer] @hasMany(indexName: "byCompany", fields: ["id"])
   categories: [Category] @hasMany(indexName: "byCompany", fields: ["id"])
-  subcategories: [Subcategory]
-    @hasMany(indexName: "byCompany", fields: ["id"])
+  subcategories: [Subcategory] @hasMany(indexName: "byCompany", fields: ["id"])
   bills: [Bill] @hasMany(indexName: "byCompany", fields: ["id"])
   createdAt: AWSDateTime
   updatedAt: AWSDateTime
 }
-
-
 
 type Product
   @model(subscriptions: null)
@@ -192,8 +187,7 @@ type Category
   name: String!
   description: String
   company: Company @belongsTo(fields: ["companyId"])
-  subcategories: [Subcategory]
-    @hasMany(indexName: "byCategory", fields: ["id"])
+  subcategories: [Subcategory] @hasMany(indexName: "byCategory", fields: ["id"])
   products: [Product] @hasMany(indexName: "byCategory", fields: ["id"])
   createdAt: AWSDateTime
   updatedAt: AWSDateTime
