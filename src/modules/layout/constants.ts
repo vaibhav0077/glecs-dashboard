@@ -5,8 +5,9 @@ import {
     TeamOutlined,
     ShoppingOutlined,
     FileTextOutlined,
-    BankOutlined,
     UserOutlined,
+    DollarOutlined,
+    ShoppingCartOutlined,
 } from "@ant-design/icons";
 import { APP_ROUTES } from "../../constants/routes";
 
@@ -22,11 +23,6 @@ export const SIDEBAR_ITEMS: SidebarItem[] = [
         key: APP_ROUTES.dashboard,
         icon: DashboardOutlined,
         label: "Dashboard",
-    },
-    {
-        key: APP_ROUTES.companies,
-        icon: BankOutlined,
-        label: "Companies",
     },
     {
         key: APP_ROUTES.users,
@@ -61,9 +57,21 @@ export const SIDEBAR_ITEMS: SidebarItem[] = [
         label: "Customers",
     },
     {
-        key: APP_ROUTES.bills,
+        key: "bills-menu",
         icon: FileTextOutlined,
         label: "Bills",
+        children: [
+            {
+                key: APP_ROUTES.billsSales,
+                icon: DollarOutlined,
+                label: "Sales Bill",
+            },
+            {
+                key: APP_ROUTES.billsPurchase,
+                icon: ShoppingCartOutlined,
+                label: "Purchase Bill",
+            },
+        ],
     },
     {
         key: APP_ROUTES.inventory,

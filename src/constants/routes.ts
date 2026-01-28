@@ -12,6 +12,8 @@ export const APP_ROUTES = {
   subcategories: "/subcategories",
   customers: "/customers",
   bills: "/bills",
+  billsSales: "/bills/sales",
+  billsPurchase: "/bills/purchase",
   inventory: "/inventory",
   companies: "/companies",
   users: "/users",

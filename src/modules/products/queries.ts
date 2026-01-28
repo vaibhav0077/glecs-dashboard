@@ -50,6 +50,7 @@ export const productsByCompanyQuery = /* GraphQL */ `
         description
         unitPrice
         unitCost
+        stockQuantity
         isActive
         category {
           id

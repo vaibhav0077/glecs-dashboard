@@ -18,6 +18,11 @@ import { SubcategoriesPage } from "../modules/products/pages/SubcategoriesPage";
 import { CustomersPage } from "../modules/customers/pages/CustomersPage";
 import { AddCustomerPage } from "../modules/customers/pages/AddCustomerPage";
 import { EditCustomerPage } from "../modules/customers/pages/EditCustomerPage";
+import { SalesBillsPage } from "../modules/bills/pages/SalesBillsPage";
+import { PurchaseBillsPage } from "../modules/bills/pages/PurchaseBillsPage";
+import { AddSalesBillPage } from "../modules/bills/pages/AddSalesBillPage";
+import { AddPurchaseBillPage } from "../modules/bills/pages/AddPurchaseBillPage";
+import { InventoryPage } from "../modules/inventory/pages/InventoryPage";
 
 type GuardProps = {
   children: React.ReactNode;
@@ -211,10 +216,34 @@ export function AppRoutes() {
           }
         />
         <Route
-          path={APP_ROUTES.bills}
+          path={APP_ROUTES.billsSales}
           element={
             <CompanyGuard>
-              <PlaceholderPage title="Bills" />
+              <SalesBillsPage />
+            </CompanyGuard>
+          }
+        />
+        <Route
+          path={`${APP_ROUTES.billsSales}/add`}
+          element={
+            <CompanyGuard>
+              <AddSalesBillPage />
+            </CompanyGuard>
+          }
+        />
+        <Route
+          path={APP_ROUTES.billsPurchase}
+          element={
+            <CompanyGuard>
+              <PurchaseBillsPage />
+            </CompanyGuard>
+          }
+        />
+        <Route
+          path={`${APP_ROUTES.billsPurchase}/add`}
+          element={
+            <CompanyGuard>
+              <AddPurchaseBillPage />
             </CompanyGuard>
           }
         />
@@ -222,7 +251,7 @@ export function AppRoutes() {
           path={APP_ROUTES.inventory}
           element={
             <CompanyGuard>
-              <PlaceholderPage title="Inventory" />
+              <InventoryPage />
             </CompanyGuard>
           }
         />

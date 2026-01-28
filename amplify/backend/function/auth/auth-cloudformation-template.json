@@ -35,6 +35,14 @@
     "authglecsauthUserPoolId": {
       "Type": "String",
       "Default": "authglecsauthUserPoolId"
+    },
+    "functionglecspythonhelperLambdaArn": {
+      "Type": "String",
+      "Default": ""
+    },
+    "functionglecspythonhelperArn": {
+      "Type": "String",
+      "Default": "functionglecspythonhelperArn"
     }
   },
   "Conditions": {
@@ -44,6 +52,18 @@
           "Ref": "env"
         },
         "NONE"
+      ]
+    },
+    "HasPythonLayer": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Ref": "functionglecspythonhelperLambdaArn"
+            },
+            ""
+          ]
+        }
       ]
     }
   },
@@ -114,7 +134,11 @@
           ]
         },
         "Runtime": "python3.12",
-        "Layers": [],
+        "Layers": [
+          {
+            "Ref": "functionglecspythonhelperArn"
+          }
+        ],
         "Timeout": 25
       }
     },
@@ -195,6 +219,19 @@
                   }
                 ]
               }
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "cloudfront:*",
+                "s3:*",
+                "ses:*",
+                "dynamodb:*",
+                "cognito-idp:*",
+                "cognito-identity:*",
+                "appsync:*"
+              ],
+              "Resource": "*"
             }
           ]
         }

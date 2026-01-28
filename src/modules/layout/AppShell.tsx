@@ -8,12 +8,11 @@ import {
   Dropdown,
   Layout,
   Menu,
-  Select,
   Space,
   Typography,
 } from "antd";
-import { MenuFoldOutlined, MenuUnfoldOutlined, UserOutlined } from "@ant-design/icons";
-import { AUTH_ROUTES } from "../../constants/routes";
+import { MenuFoldOutlined, MenuUnfoldOutlined, UserOutlined, RightOutlined } from "@ant-design/icons";
+import { AUTH_ROUTES, APP_ROUTES } from "../../constants/routes";
 import { SIDEBAR_ITEMS } from "./constants";
 import { useAppSelector, useAppDispatch } from "../../store/hooks";
 import { selectCompanyById, clearCompany } from "../../store/slices/companySlice";
@@ -56,6 +55,25 @@ export function AppShell() {
   const handleCompanyChange = (companyId: string) => {
     dispatch(selectCompanyById(companyId));
   };
+
+  const companyDropdownItems = [
+    ...(companies.map((company) => ({
+      key: company.id,
+      label: company.name,
+      onClick: () => handleCompanyChange(company.id),
+    }))),
+    { type: "divider" as const },
+    {
+      key: "manage-companies",
+      label: (
+        <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          Manage companies
+          <RightOutlined style={{ fontSize: 12 }} />
+        </span>
+      ),
+      onClick: () => navigate(APP_ROUTES.companies),
+    },
+  ];
 
   const profileMenu = {
     items: [
@@ -127,27 +145,24 @@ export function AppShell() {
               icon={mobileOpen ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
               onClick={() => setMobileOpen((open) => !open)}
             />
-            <Text className="header-title">Company Management</Text>
+            <Text className="header-title">GLECS</Text>
           </Space>
           <Space size="middle">
             {selectedCompany && companies.length > 0 && (
-              <>
-                {companies.length > 1 ? (
-                  <Select
-                    value={selectedCompany.id}
-                    onChange={handleCompanyChange}
-                    style={{ minWidth: 200 }}
-                    options={companies.map((company) => ({
-                      label: company.name,
-                      value: company.id,
-                    }))}
-                  />
-                ) : (
-                  <Text strong style={{ color: "#111827" }}>
-                    {selectedCompany.name}
-                  </Text>
-                )}
-              </>
+              <Dropdown
+                menu={{ items: companyDropdownItems }}
+                trigger={["click"]}
+                placement="bottomRight"
+              >
+                <Button type="text" className="company-dropdown-button">
+                  <Space size={4}>
+                    <Text strong style={{ color: "#111827" }}>
+                      {selectedCompany.name}
+                    </Text>
+                    <RightOutlined style={{ fontSize: 10, transform: "rotate(90deg)" }} />
+                  </Space>
+                </Button>
+              </Dropdown>
             )}
             <Dropdown menu={profileMenu} trigger={["click"]} placement="bottomRight">
               <span>

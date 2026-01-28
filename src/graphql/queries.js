@@ -1055,6 +1055,12 @@ export const userCompanyConnectionsByCompanyId = /* GraphQL */ `
         id
         userProfileEmail
         companyId
+        userProfile {
+          email
+          name
+          phone
+          __typename
+        }
         createdAt
         updatedAt
         email

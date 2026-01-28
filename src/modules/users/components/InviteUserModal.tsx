@@ -146,7 +146,6 @@ export function InviteUserModal({ open, onClose, onSuccess }: InviteUserModalPro
             <Select.Option value="STAFF">Staff</Select.Option>
             <Select.Option value="ADMIN">Admin</Select.Option>
             <Select.Option value="SUPERADMIN">Super Admin</Select.Option>
-            <Select.Option value="VAIBHAV">Vaibhav</Select.Option>
           </Select>
         </Form.Item>
 

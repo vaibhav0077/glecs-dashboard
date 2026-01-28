@@ -105,11 +105,11 @@ def invite_user():
                 status_code=400
             )
 
-        # Get Cognito User Pool ID from environment
-        user_pool_id = os.environ.get('USER_POOL_ID')
+        # Get Cognito User Pool ID from environment (set by CloudFormation as AUTH_GLECSAUTH_USERPOOLID)
+        user_pool_id = os.environ.get('AUTH_GLECSAUTH_USERPOOLID') or os.environ.get('USER_POOL_ID')
         if not user_pool_id:
             return Response(
-                body={'error': 'USER_POOL_ID environment variable not set'},
+                body={'error': 'User pool ID not set (AUTH_GLECSAUTH_USERPOOLID)'},
                 status_code=500
             )
 
@@ -120,6 +120,7 @@ def invite_user():
         temp_password += 'A1!'  # Ensure it meets password requirements
 
         try:
+            # Try to create the user (MessageAction='SUPPRESS' prevents sending welcome email)
             cognito_response = cognito_client.admin_create_user(
                 UserPoolId=user_pool_id,
                 Username=email,
@@ -128,14 +129,14 @@ def invite_user():
                     {'Name': 'email_verified', 'Value': 'true'}
                 ],
                 TemporaryPassword=temp_password,
-                MessageAction='RESEND'  # Don't send welcome email, we'll handle invitation separately
+                MessageAction='SUPPRESS'  # Don't send welcome email, we'll handle invitation separately
             )
 
             print(f"User created in Cognito: {email}")
 
         except cognito_client.exceptions.UsernameExistsException as e:
             print(f"User already exists in Cognito: {email}")
-            # Continue - user might already exist but not be linked to company
+            # User already exists - continue to ensure they're linked to company and in correct group
         except Exception as cognito_error:
             print(f"Error creating user in Cognito: {str(cognito_error)}")
             return Response(

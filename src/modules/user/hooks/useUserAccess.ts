@@ -29,7 +29,7 @@ type UserAccessState = {
   error: string | null;
 };
 
-const ADMIN_GROUPS = new Set(["ADMIN", "SUPERADMIN", "VAIBHAV"]);
+const ADMIN_GROUPS = new Set(["ADMIN", "SUPERADMIN"]);
 
 export function useUserAccess(): UserAccessState & { isAdmin: boolean } {
   const dispatch = useAppDispatch();
