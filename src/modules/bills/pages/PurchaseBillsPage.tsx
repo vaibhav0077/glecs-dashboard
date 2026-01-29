@@ -18,7 +18,7 @@ import { PlusOutlined, EditOutlined, ShoppingCartOutlined, DeleteOutlined } from
 import { useAppSelector } from "../../../store/hooks";
 import { useUserAccess } from "../../user/hooks/useUserAccess";
 import { generateClient } from "aws-amplify/api";
-import { billsByCompanyQuery, billItemsByBillQuery, deleteBillItemMutation, deleteBillMutation } from "../queries";
+import { billsByCompanyQuery, billsByCreatedByQuery, billItemsByBillQuery, deleteBillItemMutation, deleteBillMutation } from "../queries";
 import { APP_ROUTES } from "../../../constants/routes";
 
 const { Title, Text } = Typography;
@@ -48,40 +48,50 @@ const STATUS_COLORS: Record<string, string> = {
 export function PurchaseBillsPage() {
   const navigate = useNavigate();
   const { selectedCompany } = useAppSelector((state) => state.company);
-  const { email: currentUserEmail } = useUserAccess();
+  const { canViewAllBills, email: currentUserEmail } = useUserAccess();
   const [bills, setBills] = useState<Bill[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingBillId, setDeletingBillId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (selectedCompany?.id && currentUserEmail) {
+    if (selectedCompany?.id && (canViewAllBills || currentUserEmail)) {
       loadBills();
     } else {
       setBills([]);
       setLoading(false);
     }
-  }, [selectedCompany?.id, currentUserEmail]);
+  }, [selectedCompany?.id, canViewAllBills, currentUserEmail]);
 
   const loadBills = async () => {
-    if (!selectedCompany?.id || !currentUserEmail) return;
+    if (!selectedCompany?.id) return;
+    if (!canViewAllBills && !currentUserEmail) return;
     setLoading(true);
     try {
       const client = generateClient();
-      const res = (await client.graphql({
-        query: billsByCompanyQuery,
-        variables: {
-          companyId: selectedCompany.id,
-          filter: {
-            billType: { eq: "PURCHASE" },
-            createdBy: { eq: currentUserEmail },
+      if (canViewAllBills) {
+        const res = (await client.graphql({
+          query: billsByCompanyQuery,
+          variables: {
+            companyId: selectedCompany.id,
+            filter: { billType: { eq: "PURCHASE" } },
           },
-        },
-        authMode: "userPool",
-      })) as {
-        data?: { billsByCompany?: { items: Bill[] } };
-      };
-      const items = res.data?.billsByCompany?.items ?? [];
-      setBills(items);
+          authMode: "userPool",
+        })) as { data?: { billsByCompany?: { items: Bill[] } } };
+        setBills(res.data?.billsByCompany?.items ?? []);
+      } else {
+        const res = (await client.graphql({
+          query: billsByCreatedByQuery,
+          variables: {
+            createdBy: currentUserEmail!,
+            filter: {
+              companyId: { eq: selectedCompany.id },
+              billType: { eq: "PURCHASE" },
+            },
+          },
+          authMode: "userPool",
+        })) as { data?: { billsByCreatedBy?: { items: Bill[] } } };
+        setBills(res.data?.billsByCreatedBy?.items ?? []);
+      }
     } catch (e) {
       console.error(e);
       message.error("Failed to load purchase bills");
@@ -149,6 +159,12 @@ export function PurchaseBillsPage() {
       render: (v: string) => (
         <Tag color={STATUS_COLORS[v] ?? "default"}>{v}</Tag>
       ),
+    },
+    {
+      title: "Created By",
+      key: "createdBy",
+      render: (_: unknown, r: Bill) =>
+        r.creator?.name?.trim() || r.creator?.email || r.createdBy || "—",
     },
     {
       title: "Total (₹)",
@@ -240,7 +256,7 @@ export function PurchaseBillsPage() {
               columns={columns}
               pagination={{ pageSize: 10, showSizeChanger: true }}
               size="middle"
-              scroll={{ x: 480 }}
+              scroll={{ x: 580 }}
             />
           </div>
         )}

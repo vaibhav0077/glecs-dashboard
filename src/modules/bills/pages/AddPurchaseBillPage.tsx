@@ -176,6 +176,7 @@ export function AddPurchaseBillPage() {
           unitPrice: item.unitPrice,
           lineTotal: item.lineTotal ?? 0,
         };
+        if (currentUserEmail) itemInput.createdBy = currentUserEmail;
         if (item.description?.trim()) itemInput.description = item.description.trim();
 
         await client.graphql({

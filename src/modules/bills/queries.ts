@@ -45,6 +45,51 @@ export const billsByCompanyQuery = /* GraphQL */ `
   }
 `;
 
+export const billsByCreatedByQuery = /* GraphQL */ `
+  query BillsByCreatedBy(
+    $createdBy: AWSEmail!
+    $billedAt: ModelStringKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelBillFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    billsByCreatedBy(
+      createdBy: $createdBy
+      billedAt: $billedAt
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        companyId
+        createdBy
+        billType
+        billedAt
+        status
+        totalAmount
+        customerId
+        notes
+        customer {
+          id
+          name
+          email
+          phone
+        }
+        creator {
+          email
+          name
+        }
+        createdAt
+        updatedAt
+      }
+      nextToken
+    }
+  }
+`;
+
 export const getBillQuery = /* GraphQL */ `
   query GetBill($id: ID!) {
     getBill(id: $id) {

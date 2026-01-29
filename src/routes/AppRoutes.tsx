@@ -5,7 +5,6 @@ import { AuthRoutes } from "../modules/auth";
 import { useAuth } from "../modules/auth/hooks/useAuth";
 import { useUserAccess } from "../modules/user/hooks/useUserAccess";
 import { DashboardPage } from "../modules/dashboard/pages/DashboardPage";
-import { PlaceholderPage } from "../modules/pages/PlaceholderPage";
 import { NoCompanyPage } from "../modules/pages/NoCompanyPage";
 import { AppShell } from "../modules/layout/AppShell";
 import { CompaniesPage } from "../modules/company/pages/CompaniesPage";

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   Button,
@@ -20,6 +20,7 @@ import {
 } from "antd";
 import { ArrowLeftOutlined, PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useAppSelector } from "../../../store/hooks";
+import { useUserAccess } from "../../user/hooks/useUserAccess";
 import { generateClient } from "aws-amplify/api";
 import {
   getBillQuery,
@@ -77,6 +78,7 @@ export function EditSalesBillPage() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { selectedCompany } = useAppSelector((state) => state.company);
+  const { email: currentUserEmail } = useUserAccess();
   const [form] = Form.useForm();
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -98,7 +100,6 @@ export function EditSalesBillPage() {
     if (!selectedCompany || !id) return;
     setLoading(true);
     try {
-      const client = generateClient();
       await Promise.all([loadProducts(), loadCustomers(), loadBill()]);
     } catch (e) {
       console.error(e);
@@ -305,6 +306,7 @@ export function EditSalesBillPage() {
           });
           itemsToDelete.delete(item.id);
         } else {
+          if (currentUserEmail) itemInput.createdBy = currentUserEmail;
           await client.graphql({
             query: createBillItemMutation,
             variables: { input: itemInput },

@@ -238,7 +238,13 @@ type Bill
         groups: ["SUPERADMIN", "ADMIN", "VAIBHAV"]
         operations: [create, update, delete, read]
       }
-      { allow: groups, groups: ["STAFF"], operations: [read] }
+      {
+        allow: owner
+        ownerField: "createdBy"
+        identityClaim: "email"
+        provider: userPools
+        operations: [create, read, update, delete]
+      }
     ]
   ) {
   id: ID!
@@ -282,10 +288,17 @@ type BillItem
         groups: ["SUPERADMIN", "ADMIN", "VAIBHAV"]
         operations: [create, update, delete, read]
       }
-      { allow: groups, groups: ["STAFF"], operations: [read] }
+      {
+        allow: owner
+        ownerField: "createdBy"
+        identityClaim: "email"
+        provider: userPools
+        operations: [create, read, update, delete]
+      }
     ]
   ) {
   id: ID!
+  createdBy: AWSEmail
   billId: ID!
     @index(
       name: "byBill"

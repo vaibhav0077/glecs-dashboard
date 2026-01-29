@@ -32,8 +32,9 @@ type UserAccessState = {
 const ADMIN_GROUPS = new Set(["ADMIN", "SUPERADMIN"]);
 const INVITE_USER_GROUPS = new Set(["ADMIN", "SUPERADMIN", "VAIBHAV"]);
 const PRODUCT_PRICE_AND_ACTIONS_GROUPS = new Set(["ADMIN", "SUPERADMIN", "STAFF"]);
+const VIEW_ALL_BILLS_GROUPS = new Set(["ADMIN", "SUPERADMIN", "VAIBHAV"]);
 
-export function useUserAccess(): UserAccessState & { isAdmin: boolean; canInviteUser: boolean; canSeeProductPriceAndActions: boolean } {
+export function useUserAccess(): UserAccessState & { isAdmin: boolean; canInviteUser: boolean; canSeeProductPriceAndActions: boolean; canViewAllBills: boolean } {
   const dispatch = useAppDispatch();
   const [state, setState] = useState<UserAccessState>({
     email: null,
@@ -106,6 +107,7 @@ export function useUserAccess(): UserAccessState & { isAdmin: boolean; canInvite
   const isAdmin = state.groups.some((group) => ADMIN_GROUPS.has(group));
   const canInviteUser = state.groups.some((group) => INVITE_USER_GROUPS.has(group));
   const canSeeProductPriceAndActions = state.groups.some((group) => PRODUCT_PRICE_AND_ACTIONS_GROUPS.has(group));
+  const canViewAllBills = state.groups.some((group) => VIEW_ALL_BILLS_GROUPS.has(group));
 
-  return { ...state, isAdmin, canInviteUser, canSeeProductPriceAndActions };
+  return { ...state, isAdmin, canInviteUser, canSeeProductPriceAndActions, canViewAllBills };
 }
