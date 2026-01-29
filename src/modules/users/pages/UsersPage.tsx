@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
-import { Button, Card, List, Space, Typography, Tag, Empty, Spin, message } from "antd";
-import { UserOutlined, UserAddOutlined } from "@ant-design/icons";
+import { Button, Card, List, Space, Typography, Tag, Empty, Spin, message, Popconfirm } from "antd";
+import { UserOutlined, UserAddOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useAppSelector } from "../../../store/hooks";
 import { InviteUserModal } from "../components/InviteUserModal";
 import { useUserAccess } from "../../user/hooks/useUserAccess";
 import { generateClient } from "aws-amplify/api";
 import { usersByCompanyQuery, type UserCompanyConnectionItem } from "../queries";
+import { fetchAuthSession } from "aws-amplify/auth";
+import awsExports from "../../../aws-exports";
 
 const { Title, Text } = Typography;
 
@@ -28,10 +30,11 @@ function connectionToUser(item: UserCompanyConnectionItem): User {
 
 export function UsersPage() {
   const { selectedCompany } = useAppSelector((state) => state.company);
-  const { email: currentUserEmail } = useUserAccess();
+  const { email: currentUserEmail, isAdmin, canInviteUser } = useUserAccess();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
+  const [removingUserId, setRemovingUserId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!selectedCompany?.id) {
@@ -137,6 +140,60 @@ export function UsersPage() {
     }
   };
 
+  const getApiUrl = (): string => {
+    const apiConfig = (awsExports as any)?.aws_cloud_logic_custom?.find(
+      (api: any) => api.name === "glecsrestapi"
+    );
+    if (apiConfig?.endpoint) {
+      return `${apiConfig.endpoint}/auth/removeUser`;
+    }
+    throw new Error("REST API endpoint not found in configuration");
+  };
+
+  const handleRemoveUser = async (user: User) => {
+    if (!selectedCompany?.id) return;
+
+    setRemovingUserId(user.connectionId);
+    try {
+      const apiUrl = getApiUrl();
+      const session = await fetchAuthSession();
+      const idToken = session.tokens?.idToken?.toString();
+
+      if (!idToken) {
+        throw new Error("No authentication token available. Please log in again.");
+      }
+
+      const response = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${idToken}`,
+        },
+        body: JSON.stringify({
+          email: user.email,
+          companyId: selectedCompany.id,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || `Failed to remove user: ${response.status}`);
+      }
+
+      message.success(`User ${user.email} removed from company successfully`);
+      // Reload users list
+      await handleInviteSuccess();
+    } catch (err) {
+      const messageText =
+        err instanceof Error ? err.message : "Failed to remove user.";
+      message.error(messageText);
+      console.error("Error removing user:", err);
+    } finally {
+      setRemovingUserId(null);
+    }
+  };
+
   if (!selectedCompany) {
     return (
       <Card>
@@ -157,13 +214,15 @@ export function UsersPage() {
               All users connected to {selectedCompany.name}
             </Text>
           </div>
-          <Button
-            type="primary"
-            icon={<UserAddOutlined />}
-            onClick={() => setInviteModalOpen(true)}
-          >
-            Invite User
-          </Button>
+          {canInviteUser && (
+            <Button
+              type="primary"
+              icon={<UserAddOutlined />}
+              onClick={() => setInviteModalOpen(true)}
+            >
+              Invite User
+            </Button>
+          )}
         </div>
 
         {loading ? (
@@ -182,8 +241,35 @@ export function UsersPage() {
             dataSource={users}
             renderItem={(user) => {
               const isYou = Boolean(currentUserEmail && user.email?.toLowerCase() === currentUserEmail.toLowerCase());
+              const canRemove = isAdmin && !isYou;
               return (
-                <List.Item>
+                <List.Item
+                  actions={
+                    canRemove
+                      ? [
+                          <Popconfirm
+                            title="Remove user from company"
+                            description={`Are you sure you want to remove ${user.email} from this company?`}
+                            onConfirm={() => handleRemoveUser(user)}
+                            okText="Yes, Remove"
+                            cancelText="Cancel"
+                            okButtonProps={{ danger: true }}
+                            key="remove"
+                          >
+                            <Button
+                              type="text"
+                              danger
+                              icon={<DeleteOutlined />}
+                              loading={removingUserId === user.connectionId}
+                              size="small"
+                            >
+                              Remove
+                            </Button>
+                          </Popconfirm>,
+                        ]
+                      : undefined
+                  }
+                >
                   <List.Item.Meta
                     avatar={<UserOutlined style={{ fontSize: 24 }} />}
                     title={
@@ -220,6 +306,7 @@ export function UsersPage() {
           setInviteModalOpen(false);
           handleInviteSuccess();
         }}
+        existingUsers={users}
       />
     </Card>
   );

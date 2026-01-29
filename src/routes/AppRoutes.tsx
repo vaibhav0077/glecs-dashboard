@@ -25,6 +25,7 @@ import { AddPurchaseBillPage } from "../modules/bills/pages/AddPurchaseBillPage"
 import { EditSalesBillPage } from "../modules/bills/pages/EditSalesBillPage";
 import { EditPurchaseBillPage } from "../modules/bills/pages/EditPurchaseBillPage";
 import { InventoryPage } from "../modules/inventory/pages/InventoryPage";
+import { ProfilePage } from "../modules/user/pages/ProfilePage";
 
 type GuardProps = {
   children: React.ReactNode;
@@ -137,6 +138,7 @@ export function AppRoutes() {
             </CompanyGuard>
           }
         />
+        <Route path={APP_ROUTES.profile} element={<ProfilePage />} />
         <Route
           path={APP_ROUTES.companies}
           element={

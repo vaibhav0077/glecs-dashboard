@@ -4,10 +4,18 @@ import { useAppSelector } from "../../../store/hooks";
 import { fetchAuthSession } from "aws-amplify/auth";
 import awsExports from "../../../aws-exports";
 
+type User = {
+  email: string;
+  name?: string | null;
+  phone?: string | null;
+  connectionId: string;
+};
+
 type InviteUserModalProps = {
   open: boolean;
   onClose: () => void;
   onSuccess: () => void;
+  existingUsers?: User[];
 };
 
 type InviteUserFormValues = {
@@ -16,7 +24,7 @@ type InviteUserFormValues = {
   role: "ADMIN" | "SUPERADMIN" | "STAFF" | "VAIBHAV";
 };
 
-export function InviteUserModal({ open, onClose, onSuccess }: InviteUserModalProps) {
+export function InviteUserModal({ open, onClose, onSuccess, existingUsers = [] }: InviteUserModalProps) {
   const { selectedCompany } = useAppSelector((state) => state.company);
   const [form] = Form.useForm();
   const [submitting, setSubmitting] = useState(false);
@@ -77,6 +85,12 @@ export function InviteUserModal({ open, onClose, onSuccess }: InviteUserModalPro
       const data = await response.json();
 
       if (!response.ok) {
+        // Handle specific error cases
+        if (response.status === 409) {
+          // User already exists/connected
+          const errorMsg = data.error || "This user is already a member of this company.";
+          throw new Error(errorMsg);
+        }
         throw new Error(data.error || `API request failed with status ${response.status}`);
       }
 
@@ -88,6 +102,8 @@ export function InviteUserModal({ open, onClose, onSuccess }: InviteUserModalPro
       const messageText =
         err instanceof Error ? err.message : "Failed to invite user.";
       setError(messageText);
+      // Also show error in message notification
+      message.error(messageText);
       console.error("Error inviting user:", err);
     } finally {
       setSubmitting(false);
@@ -128,6 +144,25 @@ export function InviteUserModal({ open, onClose, onSuccess }: InviteUserModalPro
           rules={[
             { required: true, message: "Email is required." },
             { type: "email", message: "Please enter a valid email address." },
+            {
+              validator: (_, value) => {
+                if (!value) {
+                  return Promise.resolve();
+                }
+                const trimmedEmail = value.trim().toLowerCase();
+                // Check if email already exists in the users list (case-insensitive)
+                const emailExists = existingUsers.some(
+                  (user) => user.email?.toLowerCase() === trimmedEmail
+                );
+                if (emailExists) {
+                  return Promise.reject(
+                    new Error("This email is already a member of this company.")
+                  );
+                }
+                return Promise.resolve();
+              },
+              validateTrigger: ['onChange', 'onBlur'],
+            },
           ]}
         >
           <Input placeholder="user@example.com" />

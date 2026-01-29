@@ -19,6 +19,7 @@ import {
 } from "antd";
 import { ArrowLeftOutlined, PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useAppSelector } from "../../../store/hooks";
+import { useUserAccess } from "../../user/hooks/useUserAccess";
 import { generateClient } from "aws-amplify/api";
 import {
   createBillMutation,
@@ -59,6 +60,7 @@ type BillItemForm = {
 export function AddSalesBillPage() {
   const navigate = useNavigate();
   const { selectedCompany } = useAppSelector((state) => state.company);
+  const { email: currentUserEmail } = useUserAccess();
   const [form] = Form.useForm();
   const [submitting, setSubmitting] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
@@ -179,6 +181,7 @@ export function AddSalesBillPage() {
         status: "DRAFT",
         totalAmount: totalAmount,
       };
+      if (currentUserEmail) billInput.createdBy = currentUserEmail;
       if (values.customerId) billInput.customerId = values.customerId;
       if (values.notes?.trim()) billInput.notes = values.notes.trim();
 
@@ -226,6 +229,7 @@ export function AddSalesBillPage() {
     {
       title: "Product",
       key: "product",
+      minWidth: 180,
       render: (_: unknown, _item: unknown, index: number) => (
         <div data-row-index={index}>
           <Select
@@ -253,6 +257,7 @@ export function AddSalesBillPage() {
     {
       title: "Description",
       key: "description",
+      minWidth: 120,
       render: (_: unknown, _item: unknown, index: number) => (
         <Input
           placeholder="Optional"
@@ -264,7 +269,8 @@ export function AddSalesBillPage() {
     {
       title: "Qty",
       key: "quantity",
-      width: 100,
+      width: 90,
+      minWidth: 90,
       render: (_: unknown, _item: unknown, index: number) => (
         <InputNumber
           min={1}
@@ -277,7 +283,8 @@ export function AddSalesBillPage() {
     {
       title: "Unit Price (₹)",
       key: "unitPrice",
-      width: 130,
+      width: 120,
+      minWidth: 120,
       render: (_: unknown, _item: unknown, index: number) => (
         <InputNumber
           min={0}
@@ -291,7 +298,8 @@ export function AddSalesBillPage() {
     {
       title: "Total (₹)",
       key: "lineTotal",
-      width: 120,
+      width: 110,
+      minWidth: 110,
       render: (_: unknown, _item: unknown, index: number) => (
         <Text strong>₹{Number(items[index]?.lineTotal ?? 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}</Text>
       ),
@@ -299,7 +307,8 @@ export function AddSalesBillPage() {
     {
       title: "Action",
       key: "action",
-      width: 80,
+      width: 70,
+      minWidth: 70,
       render: (_: unknown, _item: unknown, index: number) => (
         <Button
           type="text"
@@ -385,11 +394,12 @@ export function AddSalesBillPage() {
           <Divider>Line Items</Divider>
 
           <Space direction="vertical" size="middle" style={{ width: "100%" }}>
-            <div style={{ overflowX: "auto" }}>
+            <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
               <Table
                 dataSource={items}
                 columns={itemColumns}
                 pagination={false}
+                scroll={{ x: 720 }}
                 rowKey={(_, index) => (index ?? 0).toString()}
                 summary={() => (
                   <Table.Summary fixed>
@@ -411,12 +421,13 @@ export function AddSalesBillPage() {
 
             <Button
               ref={addItemButtonRef}
-              type="dashed"
+              type="primary"
               icon={<PlusOutlined />}
               onClick={addItem}
               block
+              style={{ backgroundColor: "#52c41a", borderColor: "#52c41a" }}
             >
-              Add Item
+              Add Product
             </Button>
           </Space>
 

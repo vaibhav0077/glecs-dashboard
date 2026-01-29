@@ -4,7 +4,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(circle at top, #f5f0ff 0%, #eef1ff 40%, #ffffff 100%);
+  background: radial-gradient(
+    circle at top,
+    #f5f0ff 0%,
+    #eef1ff 40%,
+    #ffffff 100%
+  );
 }
 
 .auth-card {
@@ -18,6 +23,14 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+
+.auth-logo {
+  display: block;
+  width: 80px;
+  height: auto;
+  margin: 0 auto 16px;
+  object-fit: contain;
 }
 
 .auth-row {

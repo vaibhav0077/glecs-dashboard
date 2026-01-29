@@ -17,5 +17,6 @@ export const APP_ROUTES = {
   inventory: "/inventory",
   companies: "/companies",
   users: "/users",
+  profile: "/profile",
   noCompany: "/no-company",
 } as const;

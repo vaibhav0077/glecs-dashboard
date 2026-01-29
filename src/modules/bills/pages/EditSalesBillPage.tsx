@@ -335,10 +335,11 @@ export function EditSalesBillPage() {
     {
       title: "Product",
       key: "product",
+      minWidth: 180,
       render: (_: unknown, _item: unknown, index: number) => (
         <div data-row-index={index}>
           <Select
-            style={{ width: "100%", minWidth: 200 }}
+            style={{ width: "100%", minWidth: 180 }}
             placeholder="Select product"
             showSearch
             optionFilterProp="label"
@@ -362,6 +363,7 @@ export function EditSalesBillPage() {
     {
       title: "Description",
       key: "description",
+      minWidth: 120,
       render: (_: unknown, _item: unknown, index: number) => (
         <Input
           placeholder="Optional"
@@ -373,7 +375,8 @@ export function EditSalesBillPage() {
     {
       title: "Qty",
       key: "quantity",
-      width: 100,
+      width: 90,
+      minWidth: 90,
       render: (_: unknown, _item: unknown, index: number) => (
         <InputNumber
           min={1}
@@ -386,7 +389,8 @@ export function EditSalesBillPage() {
     {
       title: "Unit Price (₹)",
       key: "unitPrice",
-      width: 130,
+      width: 120,
+      minWidth: 120,
       render: (_: unknown, _item: unknown, index: number) => (
         <InputNumber
           min={0}
@@ -400,7 +404,8 @@ export function EditSalesBillPage() {
     {
       title: "Total (₹)",
       key: "lineTotal",
-      width: 120,
+      width: 110,
+      minWidth: 110,
       render: (_: unknown, _item: unknown, index: number) => (
         <Text strong>
           ₹{Number(items[index]?.lineTotal ?? 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
@@ -410,7 +415,8 @@ export function EditSalesBillPage() {
     {
       title: "Action",
       key: "action",
-      width: 80,
+      width: 70,
+      minWidth: 70,
       render: (_: unknown, _item: unknown, index: number) => (
         <Button
           type="text"
@@ -505,11 +511,12 @@ export function EditSalesBillPage() {
           <Divider>Line Items</Divider>
 
           <Space direction="vertical" size="middle" style={{ width: "100%" }}>
-            <div style={{ overflowX: "auto" }}>
+            <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
               <Table
                 dataSource={items}
                 columns={itemColumns}
                 pagination={false}
+                scroll={{ x: 720 }}
                 rowKey={(_, index) => items[index ?? 0]?.id ?? (index ?? 0).toString()}
                 summary={() => (
                   <Table.Summary fixed>
@@ -530,12 +537,13 @@ export function EditSalesBillPage() {
             </div>
 
             <Button
-              type="dashed"
+              type="primary"
               icon={<PlusOutlined />}
               onClick={addItem}
               block
+              style={{ backgroundColor: "#52c41a", borderColor: "#52c41a" }}
             >
-              Add Item
+              Add Product
             </Button>
           </Space>
 

@@ -18,6 +18,7 @@ import { generateClient } from "aws-amplify/api";
 import { productsByCompanyQuery } from "../../products/queries";
 import { billsByCompanyQuery, billItemsByBillQuery } from "../../bills/queries";
 import { APP_ROUTES } from "../../../constants/routes";
+import { useUserAccess } from "../../user/hooks/useUserAccess";
 
 const { Title, Text } = Typography;
 const { Search } = Input;
@@ -43,6 +44,7 @@ type BillItem = {
 export function InventoryPage() {
   const navigate = useNavigate();
   const { selectedCompany } = useAppSelector((state) => state.company);
+  const { canSeeProductPriceAndActions } = useUserAccess();
   const [products, setProducts] = useState<Product[]>([]);
   const [soldByProductId, setSoldByProductId] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
@@ -194,15 +196,19 @@ export function InventoryPage() {
                 <Col key={product.id} xs={24} sm={12} md={8} lg={6} xl={6}>
                   <Card
                     hoverable
-                    actions={[
-                      <span
-                        key="edit"
-                        onClick={() => navigate(`${APP_ROUTES.products}/edit/${product.id}`)}
-                        style={{ cursor: "pointer" }}
-                      >
-                        <EditOutlined /> Edit
-                      </span>,
-                    ]}
+                    actions={
+                      canSeeProductPriceAndActions
+                        ? [
+                            <span
+                              key="edit"
+                              onClick={() => navigate(`${APP_ROUTES.products}/edit/${product.id}`)}
+                              style={{ cursor: "pointer" }}
+                            >
+                              <EditOutlined /> Edit
+                            </span>,
+                          ]
+                        : undefined
+                    }
                   >
                     <Card.Meta
                       title={
@@ -253,20 +259,21 @@ export function InventoryPage() {
                               </Text>
                               <Text style={{ fontSize: 14 }}>{sold}</Text>
                             </Space>
-                            {(product.unitPrice != null || product.unitCost != null) && (
-                              <Space wrap>
-                                {product.unitPrice != null && (
-                                  <Text type="secondary" style={{ fontSize: 12 }}>
-                                    Price: ₹{Number(product.unitPrice).toFixed(2)}
-                                  </Text>
-                                )}
-                                {product.unitCost != null && (
-                                  <Text type="secondary" style={{ fontSize: 12 }}>
-                                    Cost: ₹{Number(product.unitCost).toFixed(2)}
-                                  </Text>
-                                )}
-                              </Space>
-                            )}
+                            {canSeeProductPriceAndActions &&
+                              (product.unitPrice != null || product.unitCost != null) && (
+                                <Space wrap>
+                                  {product.unitPrice != null && (
+                                    <Text type="secondary" style={{ fontSize: 12 }}>
+                                      Price: ₹{Number(product.unitPrice).toFixed(2)}
+                                    </Text>
+                                  )}
+                                  {product.unitCost != null && (
+                                    <Text type="secondary" style={{ fontSize: 12 }}>
+                                      Cost: ₹{Number(product.unitCost).toFixed(2)}
+                                    </Text>
+                                  )}
+                                </Space>
+                              )}
                           </Space>
                         </Space>
                       }

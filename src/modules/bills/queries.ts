@@ -20,6 +20,7 @@ export const billsByCompanyQuery = /* GraphQL */ `
       items {
         id
         companyId
+        createdBy
         billType
         billedAt
         status
@@ -31,6 +32,10 @@ export const billsByCompanyQuery = /* GraphQL */ `
           name
           email
           phone
+        }
+        creator {
+          email
+          name
         }
         createdAt
         updatedAt
@@ -45,6 +50,7 @@ export const getBillQuery = /* GraphQL */ `
     getBill(id: $id) {
       id
       companyId
+      createdBy
       billType
       billedAt
       status
@@ -56,6 +62,10 @@ export const getBillQuery = /* GraphQL */ `
         name
         email
         phone
+      }
+      creator {
+        email
+        name
       }
       createdAt
       updatedAt
@@ -109,6 +119,7 @@ export const createBillMutation = /* GraphQL */ `
     createBill(input: $input) {
       id
       companyId
+      createdBy
       billType
       billedAt
       status
@@ -126,6 +137,7 @@ export const updateBillMutation = /* GraphQL */ `
     updateBill(input: $input) {
       id
       companyId
+      createdBy
       billType
       billedAt
       status

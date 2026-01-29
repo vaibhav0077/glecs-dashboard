@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { signOut } from "aws-amplify/auth";
 import {
@@ -46,6 +46,11 @@ export function AppShell() {
     return [];
   }, [location.pathname]);
 
+  // Close mobile drawer when route changes (e.g. after selecting a sidebar item)
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [location.pathname]);
+
   const handleLogout = async () => {
     dispatch(clearCompany());
     await signOut();
@@ -79,7 +84,7 @@ export function AppShell() {
     items: [
       {
         key: "profile",
-        label: <Link to="/profile">Profile</Link>,
+        label: <Link to={APP_ROUTES.profile}>Profile</Link>,
       },
       {
         type: "divider" as const,

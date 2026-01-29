@@ -46,6 +46,7 @@ type UserProfile
   name: String
   phone: AWSPhone
   companies: [Company] @manyToMany(relationName: "UserCompanyConnection")
+  bills: [Bill] @hasMany(indexName: "byCreatedBy", fields: ["email"])
   createdAt: AWSDateTime
   updatedAt: AWSDateTime
 }
@@ -247,6 +248,12 @@ type Bill
       sortKeyFields: ["billedAt"]
       queryField: "billsByCompany"
     )
+  createdBy: AWSEmail
+    @index(
+      name: "byCreatedBy"
+      sortKeyFields: ["billedAt"]
+      queryField: "billsByCreatedBy"
+    )
   billType: BillType!
   billedAt: AWSDateTime!
   status: BillStatus!
@@ -259,6 +266,7 @@ type Bill
     )
   notes: String
   company: Company @belongsTo(fields: ["companyId"])
+  creator: UserProfile @belongsTo(fields: ["createdBy"])
   customer: Customer @belongsTo(fields: ["customerId"])
   items: [BillItem] @hasMany(indexName: "byBill", fields: ["id"])
   createdAt: AWSDateTime

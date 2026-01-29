@@ -26,6 +26,7 @@ import {
   deleteProductMutation,
 } from "../queries";
 import { APP_ROUTES } from "../../../constants/routes";
+import { useUserAccess } from "../../user/hooks/useUserAccess";
 
 const { Title, Text } = Typography;
 const { Search } = Input;
@@ -58,6 +59,7 @@ type Subcategory = {
 export function ProductsPage() {
   const navigate = useNavigate();
   const { selectedCompany } = useAppSelector((state) => state.company);
+  const { canSeeProductPriceAndActions } = useUserAccess();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
@@ -236,14 +238,16 @@ export function ProductsPage() {
             </Title>
             <Text type="secondary">Manage products for {selectedCompany.name}</Text>
           </div>
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() => navigate(`${APP_ROUTES.products}/add`)}
-            style={{ flexShrink: 0 }}
-          >
-            Add Product
-          </Button>
+          {canSeeProductPriceAndActions && (
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => navigate(`${APP_ROUTES.products}/add`)}
+              style={{ flexShrink: 0 }}
+            >
+              Add Product
+            </Button>
+          )}
         </div>
 
         <Space direction="vertical" size="middle" style={{ width: "100%" }}>
@@ -317,33 +321,37 @@ export function ProductsPage() {
               <Col key={product.id} xs={24} sm={12} md={8} lg={6} xl={6}>
                 <Card
                   hoverable
-                  actions={[
-                    <Button
-                      key="edit"
-                      type="link"
-                      icon={<EditOutlined />}
-                      onClick={() => navigate(`${APP_ROUTES.products}/edit/${product.id}`)}
-                    >
-                      Edit
-                    </Button>,
-                    <Popconfirm
-                      key="delete"
-                      title="Delete Product"
-                      description={`Are you sure you want to delete "${product.name}"?`}
-                      onConfirm={() => handleDelete(product)}
-                      okText="Delete"
-                      okType="danger"
-                      cancelText="Cancel"
-                    >
-                      <Button
-                        type="link"
-                        danger
-                        icon={<DeleteOutlined />}
-                      >
-                        Delete
-                      </Button>
-                    </Popconfirm>,
-                  ]}
+                  actions={
+                    canSeeProductPriceAndActions
+                      ? [
+                          <Button
+                            key="edit"
+                            type="link"
+                            icon={<EditOutlined />}
+                            onClick={() => navigate(`${APP_ROUTES.products}/edit/${product.id}`)}
+                          >
+                            Edit
+                          </Button>,
+                          <Popconfirm
+                            key="delete"
+                            title="Delete Product"
+                            description={`Are you sure you want to delete "${product.name}"?`}
+                            onConfirm={() => handleDelete(product)}
+                            okText="Delete"
+                            okType="danger"
+                            cancelText="Cancel"
+                          >
+                            <Button
+                              type="link"
+                              danger
+                              icon={<DeleteOutlined />}
+                            >
+                              Delete
+                            </Button>
+                          </Popconfirm>,
+                        ]
+                      : undefined
+                  }
                 >
                   <Card.Meta
                     title={
@@ -376,11 +384,13 @@ export function ProductsPage() {
                             <Tag color="cyan">{product.subcategory.name}</Tag>
                           )}
                         </Space>
-                        {product.unitPrice !== null && product.unitPrice !== undefined && (
-                          <Text strong style={{ fontSize: 16, color: "#1890ff" }}>
-                            ₹{product.unitPrice.toFixed(2)}
-                          </Text>
-                        )}
+                        {canSeeProductPriceAndActions &&
+                          product.unitPrice !== null &&
+                          product.unitPrice !== undefined && (
+                            <Text strong style={{ fontSize: 16, color: "#1890ff" }}>
+                              ₹{product.unitPrice.toFixed(2)}
+                            </Text>
+                          )}
                       </Space>
                     }
                   />
